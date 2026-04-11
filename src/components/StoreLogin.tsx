@@ -22,8 +22,6 @@ export function StoreLogin({ onLogin }: StoreLoginProps) {
     setIsLoading(false);
   };
 
-  
-
   return (
     <div className="min-h-screen w-full flex bg-white overflow-hidden">
       {/* Left Side: Login Form */}

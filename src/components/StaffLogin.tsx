@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Delete, UserCircle2, Users, Table, Clock, TrendingUp, ChevronLeft, Settings, X, Power } from "lucide-react";
 import { STAFF_MEMBERS, Staff } from "@/src/types";
-import { exit } from "@tauri-apps/plugin-process";
 
 interface StaffLoginProps {
   onLogin: (staff: Staff) => void;
@@ -32,10 +31,6 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
   const handleDelete = () => {
     setCode(prev => prev.slice(0, -1));
     setError(false);
-  };
-
-  const handleExit = async () => {
-    await exit(0);
   };
 
   useEffect(() => {
@@ -76,7 +71,7 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
                     <div className="w-px h-4 bg-white/10 self-center" />
                     <button 
                       className="flex items-center gap-2 text-white hover:text-red-500 group"
-                      onClick={handleExit}
+                      onClick={() => window.location.reload()}
                     >
                       <Power className="w-4 h-4" />
                       <span className="text-sm font-bold">Shut Off System</span>
