@@ -1,5 +1,27 @@
-node_modules
-dist
-src-tauri/target
-.DS_Store
+# Dependencies
+node_modules/
+/dist
+/src-tauri/target
+
+# Tauri v2 specifieke mappen
+/src-tauri/gen
+
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS specifieke bestanden
+.DS_Store
+Thumbs.db
+
+# IDE instellingen
+.vscode/
+.idea/
+*.swp
+*.scratch
+
+# Environment variables (belangrijk voor beveiliging!)
+.env
+.env.local
