@@ -190,22 +190,22 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
       </ScrollArea>
 
       {/* Fixed Footer */}
-      <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0">
-        <div className="flex flex-col gap-2">
+      <div className="p-10 bg-white border-t border-zinc-200 flex flex-col gap-8 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0">
+        <div className="flex flex-col gap-3">
           <div className="flex justify-between items-center text-zinc-400">
-            <span className="text-xs font-black uppercase tracking-widest">Subtotal</span>
-            <span className="text-lg font-black tabular-nums">${subtotal.toFixed(2)}</span>
+            <span className="text-sm font-black uppercase tracking-widest">Subtotal</span>
+            <span className="text-xl font-black tabular-nums">${subtotal.toFixed(2)}</span>
           </div>
           
           {discounts.length > 0 && (
-            <div className="flex flex-col gap-2 py-2 border-y border-zinc-50">
+            <div className="flex flex-col gap-3 py-3 border-y border-zinc-50">
               {discounts.map((d, i) => (
                 <div key={i} className="flex justify-between items-center text-orange-600">
-                  <span className="text-xs font-black uppercase tracking-widest flex items-center gap-3">
-                    <Tag className="w-4 h-4 stroke-[3]" />
+                  <span className="text-sm font-black uppercase tracking-widest flex items-center gap-3">
+                    <Tag className="w-5 h-5 stroke-[3]" />
                     {d.label}
                   </span>
-                  <span className="text-lg font-black tabular-nums">
+                  <span className="text-xl font-black tabular-nums">
                     -{d.type === 'percentage' ? `${d.value}%` : `$${d.value.toFixed(2)}`}
                   </span>
                 </div>
@@ -214,25 +214,25 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
           )}
 
           <div className="flex justify-between items-center text-zinc-400">
-            <span className="text-xs font-black uppercase tracking-widest">Tax (8%)</span>
-            <span className="text-lg font-black tabular-nums">${tax.toFixed(2)}</span>
+            <span className="text-sm font-black uppercase tracking-widest">Tax (8%)</span>
+            <span className="text-xl font-black tabular-nums">${tax.toFixed(2)}</span>
           </div>
         </div>
 
         <Button 
           onClick={onCheckout}
-          className="w-full h-24 bg-zinc-900 hover:bg-zinc-800 text-white font-black text-2xl rounded-[2rem] shadow-xl shadow-zinc-200 active:scale-[0.98] transition-all"
+          className="w-full h-28 bg-zinc-900 hover:bg-zinc-800 text-white font-black text-3xl rounded-[2.5rem] shadow-xl shadow-zinc-200 active:scale-[0.98] transition-all"
         >
           COMPLETE CHECKOUT
         </Button>
 
-        <div className="flex justify-between items-end">
+        <div className="flex justify-between items-end pt-4">
           <div className="flex flex-col">
-            <span className="text-base font-black text-zinc-400 uppercase tracking-widest mb-2">Total</span>
-            <div className="flex items-center gap-4">
-              <span className="text-6xl font-black text-orange-500 tabular-nums tracking-tighter">${total.toFixed(2)}</span>
-              <span className="text-3xl font-black text-zinc-200">—</span>
-              <span className="text-3xl font-black text-zinc-400 tabular-nums">{itemCount} ITEMS</span>
+            <span className="text-lg font-black text-zinc-400 uppercase tracking-widest mb-3">Total</span>
+            <div className="flex items-center gap-6">
+              <span className="text-6xl font-black text-orange-500 tabular-nums tracking-tighter leading-none">${total.toFixed(2)}</span>
+              <span className="text-4xl font-black text-zinc-200">—</span>
+              <span className="text-4xl font-black text-zinc-400 tabular-nums leading-none">{itemCount} ITEMS</span>
             </div>
           </div>
         </div>

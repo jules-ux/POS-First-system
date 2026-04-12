@@ -164,8 +164,15 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0 }}
-            className="w-full h-full relative"
-            style={{ zoom: 0.67 }}
+            className="absolute top-0 left-0 overflow-hidden"
+            style={{ 
+              width: '200%', 
+              height: '200%', 
+              minWidth: '200%',
+              minHeight: '200%',
+              transform: 'scale(0.50)',
+              transformOrigin: 'top left'
+            }}
           >
             <div className="w-full h-full flex">
               <main className="flex-1 flex flex-col min-w-0">
