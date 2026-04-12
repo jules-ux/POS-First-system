@@ -3,13 +3,18 @@ import { Product, PRODUCTS } from "@/src/types";
 
 interface ProductGridProps {
   onAddToCart: (product: Product) => void;
+  selectedCategory: string;
 }
 
-export function ProductGrid({ onAddToCart }: ProductGridProps) {
+export function ProductGrid({ onAddToCart, selectedCategory }: ProductGridProps) {
+  const filteredProducts = PRODUCTS
+    .filter(p => p.category === selectedCategory)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div className="flex-1 flex flex-col p-4 gap-4 bg-zinc-50/30 overflow-hidden">
       <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 overflow-y-auto pr-2 custom-scrollbar">
-        {PRODUCTS.map((product) => (
+        {filteredProducts.map((product) => (
           <motion.div
             key={product.id}
             layout

@@ -12,7 +12,7 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
-export const CATEGORIES = ["All", "Coffee", "Tea", "Pastries", "Sandwiches", "Desserts"];
+export const CATEGORIES = ["FOOD", "DRINK", "SNACK", "MISC", "DESSERT", "ALCOHOL", "SIDES", "SPECIALS", "PROMO", "KIDS"];
 
 export interface Staff {
   id: string;
@@ -54,7 +54,7 @@ export const PRODUCTS: Product[] = [
     id: "1",
     name: "Espresso",
     price: 3.50,
-    category: "Coffee",
+    category: "DRINK",
     image: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400&h=400&fit=crop",
     stock: 50
   },
@@ -62,7 +62,7 @@ export const PRODUCTS: Product[] = [
     id: "2",
     name: "Cappuccino",
     price: 4.50,
-    category: "Coffee",
+    category: "DRINK",
     image: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=400&h=400&fit=crop",
     stock: 40
   },
@@ -70,7 +70,7 @@ export const PRODUCTS: Product[] = [
     id: "3",
     name: "Green Tea",
     price: 3.00,
-    category: "Tea",
+    category: "DRINK",
     image: "https://images.unsplash.com/photo-1523906630133-f1c83ff3f4b0?w=400&h=400&fit=crop",
     stock: 30
   },
@@ -78,7 +78,7 @@ export const PRODUCTS: Product[] = [
     id: "4",
     name: "Croissant",
     price: 3.75,
-    category: "Pastries",
+    category: "FOOD",
     image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=400&fit=crop",
     stock: 15
   },
@@ -86,7 +86,7 @@ export const PRODUCTS: Product[] = [
     id: "5",
     name: "Club Sandwich",
     price: 8.50,
-    category: "Sandwiches",
+    category: "FOOD",
     image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&h=400&fit=crop",
     stock: 10
   },
@@ -94,7 +94,7 @@ export const PRODUCTS: Product[] = [
     id: "6",
     name: "Blueberry Muffin",
     price: 3.25,
-    category: "Pastries",
+    category: "SNACK",
     image: "https://images.unsplash.com/photo-1558401391-7899b4bd5bbf?w=400&h=400&fit=crop",
     stock: 20
   },
@@ -102,7 +102,7 @@ export const PRODUCTS: Product[] = [
     id: "7",
     name: "Iced Latte",
     price: 4.75,
-    category: "Coffee",
+    category: "DRINK",
     image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400&h=400&fit=crop",
     stock: 25
   },
@@ -110,8 +110,16 @@ export const PRODUCTS: Product[] = [
     id: "8",
     name: "Cheesecake",
     price: 5.50,
-    category: "Desserts",
+    category: "SNACK",
     image: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400&h=400&fit=crop",
     stock: 8
+  },
+  {
+    id: "9",
+    name: "Paper Bag",
+    price: 0.10,
+    category: "MISC",
+    image: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=400&h=400&fit=crop",
+    stock: 1000
   }
 ];

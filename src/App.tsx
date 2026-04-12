@@ -9,7 +9,7 @@ import { ProductGrid } from "./components/ProductGrid";
 import { OrderPanel } from "./components/OrderPanel";
 import { StoreLogin } from "./components/StoreLogin";
 import { StaffLogin } from "./components/StaffLogin";
-import { Product, CartItem, Staff, PRODUCTS } from "@/src/types";
+import { Product, CartItem, Staff, PRODUCTS, CATEGORIES } from "@/src/types";
 import { AnimatePresence, motion } from "motion/react";
 import { Printer, DoorOpen, LogOut, Delete, CreditCard, Utensils, Copy, Badge, Edit3, MessageSquare, BookOpen, UserCheck, Plus, Trash2, Wallet, Users, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ export default function App() {
   const [step, setStep] = useState<AppStep>("store-login");
   const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("FOOD");
 
   const [pendingQty, setPendingQty] = useState("");
   const [isNegative, setIsNegative] = useState(false);
@@ -105,25 +106,58 @@ export default function App() {
               <main className="flex-1 flex flex-col min-w-0">
                 <TopBar staff={currentStaff} />
                 <div className="flex-1 flex overflow-hidden">
-                  {/* Left Section: Category & Quick Actions */}
-                  <div className="w-32 bg-zinc-50 border-r border-zinc-200 flex flex-col overflow-y-auto scrollbar-hide">
+                  {/* Left Section: Column 1 (Fixed) */}
+                  <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-hidden">
                     <div className="flex flex-col">
-                      <NavBlock label="FOOD" active />
-                      <NavBlock label="DRINK" />
-                      <NavBlock label="SNACK" />
-                      <NavBlock label="MISC" />
+                      {CATEGORIES.slice(0, 5).map((cat) => (
+                        <div key={cat}>
+                          <NavBlock 
+                            label={cat} 
+                            active={selectedCategory === cat} 
+                            onClick={() => setSelectedCategory(cat)}
+                          />
+                        </div>
+                      ))}
                     </div>
                     <div className="mt-auto border-t border-zinc-200 flex flex-col">
                       <ActionBlock icon={Printer} label="PRINT" />
                       <ActionBlock icon={DoorOpen} label="DRAWER" />
-                      <ActionBlock icon={LogOut} label="OUT" />
+                      <ActionBlock 
+                        icon={LogOut} 
+                        label="OUT" 
+                        onClick={() => {
+                          setCurrentStaff(null);
+                          setStep("staff-login");
+                        }} 
+                      />
                     </div>
                   </div>
 
-                  {/* Middle Section: Product Grid & Entry */}
+                  {/* Middle Section: Product Grid, Second Category Column, and Bottom Panel */}
                   <div className="flex-1 flex flex-col min-w-0">
-                    <ProductGrid onAddToCart={handleAddToCart} />
-                    <div className="h-[500px] border-t border-zinc-200 bg-white flex">
+                    <div className="flex-1 flex overflow-hidden">
+                      {/* Column 2: Categories 6-10 (Only at the top) */}
+                      {CATEGORIES.length > 5 && (
+                        <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
+                          <div className="flex flex-col">
+                            {CATEGORIES.slice(5, 10).map((cat) => (
+                              <div key={cat}>
+                                <NavBlock 
+                                  label={cat} 
+                                  active={selectedCategory === cat} 
+                                  onClick={() => setSelectedCategory(cat)}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      <ProductGrid 
+                        onAddToCart={handleAddToCart} 
+                        selectedCategory={selectedCategory}
+                      />
+                    </div>
+                    <div className="h-[512px] border-t border-zinc-200 bg-white flex">
                       <div className="flex-1 p-6 grid grid-cols-4 grid-rows-4 gap-3">
                         <QuickShortcut label="QUICK SALE" icon={CreditCard} active />
                         <QuickShortcut label="TABLES" icon={Utensils} />
@@ -198,9 +232,10 @@ export default function App() {
   );
 }
 
-function NavBlock({ label, active = false }: { label: string, active?: boolean }) {
+function NavBlock({ label, active = false, onClick }: { label: string, active?: boolean, onClick?: () => void }) {
   return (
     <button 
+      onClick={onClick}
       className={`w-full h-32 flex items-center justify-center text-xs font-bold tracking-[0.2em] transition-none border-b border-zinc-100 ${
         active 
           ? "bg-zinc-100 text-zinc-900" 
@@ -212,9 +247,10 @@ function NavBlock({ label, active = false }: { label: string, active?: boolean }
   );
 }
 
-function ActionBlock({ icon: Icon, label }: { icon: any, label: string }) {
+function ActionBlock({ icon: Icon, label, onClick }: { icon: any, label: string, onClick?: () => void }) {
   return (
     <button 
+      onClick={onClick}
       className="w-full h-32 flex flex-col items-center justify-center gap-2 text-[10px] font-bold tracking-widest transition-none border-b border-zinc-100 bg-white text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
     >
       <Icon className="w-6 h-6" />
