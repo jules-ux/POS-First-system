@@ -95,7 +95,7 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
   };
 
   return (
-    <div className="w-full lg:w-[480px] h-full max-h-full bg-white border-l border-zinc-200 flex flex-col overflow-hidden relative">
+    <div className="w-full lg:w-[580px] h-full max-h-full bg-white border-l border-zinc-200 flex flex-col overflow-hidden relative">
       <div className="p-8 border-b border-zinc-200 flex items-center justify-between bg-white z-10 shrink-0">
         <div>
           <h2 className="text-3xl font-black text-zinc-900 tracking-tight">Current Order</h2>

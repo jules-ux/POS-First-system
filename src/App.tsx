@@ -171,7 +171,7 @@ export default function App() {
                 <TopBar staff={currentStaff} />
                 <div className="flex-1 flex overflow-hidden">
                   {/* Left Section: Column 1 (Fixed) - ALWAYS VISIBLE */}
-                  <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-hidden shrink-0">
+                  <div className="w-40 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-hidden shrink-0">
                     <div className="flex flex-col">
                       {CATEGORIES.slice(0, 5).map((cat) => (
                         <div key={cat}>
@@ -203,7 +203,7 @@ export default function App() {
                     <div className="flex-1 flex overflow-hidden">
                       {/* Column 2: Categories 6-10 (Always Visible) */}
                       {CATEGORIES.length > 5 && (
-                        <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
+                        <div className="w-40 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
                           <div className="flex flex-col">
                             {CATEGORIES.slice(5, 10).map((cat) => (
                               <div key={cat}>
@@ -331,7 +331,7 @@ export default function App() {
                     </div>
 
                   {/* Bottom Area: Shortcuts and Number Pad (Always Visible) */}
-                  <div className="h-[512px] border-t border-zinc-200 bg-white flex shrink-0">
+                  <div className="h-[640px] border-t border-zinc-200 bg-white flex shrink-0">
                     <div className="flex-1 p-6 grid grid-cols-4 grid-rows-4 gap-3">
                       <QuickShortcut 
                         label="QUICK SALE" 
@@ -537,7 +537,7 @@ function NavBlock({ label, active = false, onClick }: { label: string, active?: 
   return (
     <button 
       onClick={onClick}
-      className={`w-full h-32 flex items-center justify-center text-sm font-black tracking-[0.2em] transition-none border-b border-zinc-100 ${
+      className={`w-full h-40 flex items-center justify-center text-base font-black tracking-[0.2em] transition-none border-b border-zinc-100 ${
         active 
           ? "bg-zinc-900 text-white" 
           : "bg-white text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
@@ -552,9 +552,9 @@ function ActionBlock({ icon: Icon, label, onClick }: { icon: any, label: string,
   return (
     <button 
       onClick={onClick}
-      className="w-full h-32 flex flex-col items-center justify-center gap-3 text-xs font-black tracking-widest transition-none border-b border-zinc-100 bg-white text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
+      className="w-full h-40 flex flex-col items-center justify-center gap-4 text-sm font-black tracking-widest transition-none border-b border-zinc-100 bg-white text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
     >
-      <Icon className="w-8 h-8 stroke-[2.5]" />
+      <Icon className="w-10 h-10 stroke-[2.5]" />
       {label}
     </button>
   );
@@ -564,7 +564,7 @@ function QuickShortcut({ label, icon: Icon, active = false, accent = false, oran
   return (
     <button 
       onClick={onClick}
-      className={`h-full w-full border rounded-3xl flex flex-col items-center justify-center gap-3 transition-none group ${
+      className={`h-full w-full border rounded-[2rem] flex flex-col items-center justify-center gap-4 transition-none group ${
       active && !orange
         ? "bg-zinc-900 border-zinc-950 text-white shadow-xl shadow-zinc-200" 
         : orange
@@ -573,8 +573,8 @@ function QuickShortcut({ label, icon: Icon, active = false, accent = false, oran
             ? "bg-zinc-50 border-zinc-100 text-zinc-600 hover:border-zinc-300"
             : "bg-white border-zinc-200 text-zinc-400 hover:border-zinc-400 hover:text-zinc-900"
     }`}>
-      {Icon && <Icon className={`w-10 h-10 stroke-[2.5] ${active && !orange ? "text-white" : orange ? "text-orange-500" : accent ? "text-zinc-500" : "text-zinc-300 group-hover:text-zinc-500"}`} />}
-      <span className={`text-xs font-black tracking-widest uppercase ${active && !orange ? "text-white" : orange ? "text-orange-600" : accent ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-900"}`}>{label}</span>
+      {Icon && <Icon className={`w-12 h-12 stroke-[2.5] ${active && !orange ? "text-white" : orange ? "text-orange-500" : accent ? "text-zinc-500" : "text-zinc-300 group-hover:text-zinc-500"}`} />}
+      <span className={`text-sm font-black tracking-widest uppercase ${active && !orange ? "text-white" : orange ? "text-orange-600" : accent ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-900"}`}>{label}</span>
     </button>
   );
 }
@@ -597,12 +597,12 @@ function NumberPad({
   };
 
   return (
-    <div className="w-[450px] border-l border-zinc-200 p-6 grid grid-cols-3 gap-3 bg-zinc-50/30">
+    <div className="w-[500px] border-l border-zinc-200 p-8 grid grid-cols-3 gap-4 bg-zinc-50/30">
       {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
         <Button 
           key={n} 
           variant="outline" 
-          className="h-full text-3xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-2xl shadow-sm transition-none"
+          className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-[2rem] shadow-sm transition-none"
           onClick={() => handlePress(n.toString())}
         >
           {n}
@@ -610,28 +610,28 @@ function NumberPad({
       ))}
       <Button 
         variant="outline" 
-        className="h-full text-3xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-2xl shadow-sm transition-none"
+        className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-[2rem] shadow-sm transition-none"
         onClick={() => handlePress("9")}
       >
         9
       </Button>
       <Button 
         variant="outline" 
-        className="h-full text-zinc-400 hover:text-red-500 rounded-2xl transition-none"
+        className="h-full text-zinc-400 hover:text-red-500 rounded-[2rem] transition-none"
         onClick={onClear}
       >
-        <Delete className="w-10 h-10" />
+        <Delete className="w-12 h-12" />
       </Button>
       <Button 
         variant="outline" 
-        className="h-full text-3xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-2xl shadow-sm transition-none"
+        className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-[2rem] shadow-sm transition-none"
         onClick={() => handlePress("0")}
       >
         0
       </Button>
       <Button 
         variant="outline" 
-        className={`h-full text-4xl font-black rounded-2xl transition-none ${isNegative ? "bg-red-500 text-white border-red-600" : "bg-white border-zinc-200 text-zinc-400 hover:text-zinc-900"}`}
+        className={`h-full text-5xl font-black rounded-[2rem] transition-none ${isNegative ? "bg-red-500 text-white border-red-600" : "bg-white border-zinc-200 text-zinc-400 hover:text-zinc-900"}`}
         onClick={onToggleNegative}
       >
         -

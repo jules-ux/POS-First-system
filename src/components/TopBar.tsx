@@ -33,7 +33,7 @@ export function TopBar({ staff }: TopBarProps) {
   };
 
   return (
-    <header className="h-32 border-b border-zinc-200 bg-white flex items-center justify-between sticky top-0 z-10">
+    <header className="h-40 border-b border-zinc-200 bg-white flex items-center justify-between sticky top-0 z-10">
       <div className="flex items-center h-full">
         {/* Navigation Modes */}
         <div className="flex h-full border-r border-zinc-200">
@@ -80,13 +80,13 @@ export function TopBar({ staff }: TopBarProps) {
 function ModeButton({ icon: Icon, active = false }: { icon: any, active?: boolean }) {
   return (
     <button 
-      className={`w-32 h-full flex items-center justify-center transition-none border-r border-zinc-100 last:border-r-0 ${
+      className={`w-40 h-full flex items-center justify-center transition-none border-r border-zinc-100 last:border-r-0 ${
         active 
           ? "bg-zinc-100 text-zinc-900" 
           : "text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
       }`}
     >
-      <Icon className="w-10 h-10" />
+      <Icon className="w-12 h-12" />
     </button>
   );
 }
