@@ -11,7 +11,7 @@ import { StoreLogin } from "./components/StoreLogin";
 import { StaffLogin } from "./components/StaffLogin";
 import { Product, CartItem, Staff, PRODUCTS, CATEGORIES } from "@/src/types";
 import { AnimatePresence, motion } from "motion/react";
-import { Printer, DoorOpen, LogOut, Delete, CreditCard, Utensils, Copy, Badge, Edit3, MessageSquare, BookOpen, UserCheck, Plus, Trash2, Wallet, Users, Bell } from "lucide-react";
+import { Printer, DoorOpen, LogOut, Delete, CreditCard, Utensils, Copy, Badge, Edit3, MessageSquare, BookOpen, UserCheck, Plus, Trash2, Wallet, Users, Bell, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type AppStep = "store-login" | "staff-login" | "pos";
@@ -120,6 +120,7 @@ export default function App() {
                       ))}
                     </div>
                     <div className="mt-auto border-t border-zinc-200 flex flex-col">
+                      <ActionBlock icon={Send} label="SEND" />
                       <ActionBlock icon={Printer} label="PRINT" />
                       <ActionBlock icon={DoorOpen} label="DRAWER" />
                       <ActionBlock 
