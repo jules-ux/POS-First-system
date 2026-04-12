@@ -218,7 +218,7 @@ export default function App() {
                         </div>
                       )}
 
-                      <div className="flex-1 relative overflow-hidden">
+                      <div className="flex-1 relative overflow-hidden flex flex-col">
                         {activeMode === "SPLIT" ? (
                           <SplitView 
                             mainCart={cart}

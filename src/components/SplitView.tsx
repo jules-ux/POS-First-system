@@ -120,7 +120,7 @@ export function SplitView({
           </div>
         </div>
         
-        <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] shrink-0">
+        <div className="p-8 pb-0 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] shrink-0">
           <div className="flex justify-between items-center">
             <div className="space-y-1">
               <span className="text-sm font-black text-zinc-400 uppercase tracking-widest block">Partial Total</span>
