@@ -116,9 +116,9 @@ export function SplitView({
           <Button 
             disabled={splitCart.length === 0}
             onClick={onPaySplit}
-            className="w-full h-20 bg-zinc-900 hover:bg-zinc-800 text-white font-black text-xl rounded-2xl shadow-lg disabled:opacity-50"
+            className="w-full h-20 bg-orange-500 hover:bg-orange-600 text-white font-black text-xl rounded-2xl shadow-lg shadow-orange-100 disabled:opacity-50 active:scale-[0.98] transition-all"
           >
-            <CheckCircle2 className="w-6 h-6 mr-3" />
+            <CheckCircle2 className="w-6 h-6 mr-3 stroke-[3]" />
             PAY PARTIAL BILL
           </Button>
         </div>
@@ -164,7 +164,7 @@ export function SplitView({
                   </Button>
                 ))}
                 <Button
-                  className="h-20 bg-zinc-900 text-white rounded-2xl font-black text-xl"
+                  className="h-20 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-xl shadow-lg shadow-orange-100 active:scale-[0.98] transition-all"
                   onClick={confirmMove}
                 >
                   OK

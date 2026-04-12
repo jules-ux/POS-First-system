@@ -199,138 +199,135 @@ export default function App() {
                   </div>
 
                   <div className="flex-1 flex flex-col overflow-hidden">
-                    {/* Top Area: Categories + Product Grid OR Mode Views */}
+                    {/* Top Area: Categories 6-10 + Product Grid OR Mode Views */}
                     <div className="flex-1 flex overflow-hidden">
-                      {activeMode === "SPLIT" ? (
-                        <SplitView 
-                          mainCart={cart}
-                          splitCart={splitCart}
-                          exitRequested={exitWarningMode === "SPLIT"}
-                          onMoveToSplit={(item, qty) => {
-                            setCart(prev => {
-                              const existing = prev.find(i => i.cartItemId === item.cartItemId);
-                              if (!existing) return prev;
-                              if (existing.quantity === qty) return prev.filter(i => i.cartItemId !== item.cartItemId);
-                              return prev.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity - qty } : i);
-                            });
-                            setSplitCart(prev => {
-                              const existing = prev.find(i => i.cartItemId === item.cartItemId);
-                              if (existing) return prev.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity + qty } : i);
-                              return [...prev, { ...item, quantity: qty }];
-                            });
-                          }}
-                          onMoveToMain={(item, qty) => {
-                            setSplitCart(prev => {
-                              const existing = prev.find(i => i.cartItemId === item.cartItemId);
-                              if (!existing) return prev;
-                              if (existing.quantity === qty) return prev.filter(i => i.cartItemId !== item.cartItemId);
-                              return prev.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity - qty } : i);
-                            });
-                            setCart(prev => {
-                              const existing = prev.find(i => i.cartItemId === item.cartItemId);
-                              if (existing) return prev.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity + qty } : i);
-                              return [...prev, { ...item, quantity: qty }];
-                            });
-                          }}
-                          onPaySplit={() => {
-                            setSplitCart([]);
-                            setActiveMode("NONE");
-                            setExitWarningMode("NONE");
-                          }}
-                          onCancel={() => requestMode("NONE")}
-                          onConfirmExit={() => {
-                            // Return all items from splitCart to cart
-                            setCart(prev => {
-                              let newCart = [...prev];
-                              splitCart.forEach(item => {
-                                const existing = newCart.find(i => i.cartItemId === item.cartItemId);
-                                if (existing) {
-                                  newCart = newCart.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity + item.quantity } : i);
-                                } else {
-                                  newCart.push(item);
-                                }
-                              });
-                              return newCart;
-                            });
-                            setSplitCart([]);
-                            setActiveMode(pendingMode);
-                            setExitWarningMode("NONE");
-                            setPendingMode("NONE");
-                          }}
-                          onCancelExit={() => {
-                            setExitWarningMode("NONE");
-                            setPendingMode("NONE");
-                          }}
-                        />
-                      ) : activeMode === "COUPON" ? (
-                        <CouponView 
-                          pendingValue={pendingQty}
-                          discounts={discounts}
-                          onRemoveDiscount={handleRemoveDiscount}
-                          exitRequested={exitWarningMode === "COUPON"}
-                          onApplyDiscount={(type, value, label) => {
-                            setDiscounts(prev => [...prev, { type, value, label }]);
-                            setPendingQty("");
-                            setCouponCode("");
-                            setActiveMode("NONE");
-                            setExitWarningMode("NONE");
-                          }}
-                          onCancel={() => requestMode("NONE")}
-                          onConfirmExit={() => {
-                            setPendingQty("");
-                            setCouponCode("");
-                            setActiveMode(pendingMode);
-                            setExitWarningMode("NONE");
-                            setPendingMode("NONE");
-                          }}
-                          onCancelExit={() => {
-                            setExitWarningMode("NONE");
-                            setPendingMode("NONE");
-                          }}
-                        />
-                      ) : activeMode === "TABLES" ? (
-                        <div className="flex-1 flex items-center justify-center bg-zinc-50">
-                          <div className="text-center space-y-4">
-                            <div className="w-24 h-24 bg-zinc-100 rounded-full flex items-center justify-center mx-auto">
-                              <Utensils className="w-12 h-12 text-zinc-300" />
-                            </div>
-                            <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-widest">Table Management</h3>
-                            <p className="text-zinc-400 font-medium">Select a table to start an order</p>
-                            <Button 
-                              variant="outline" 
-                              onClick={() => setActiveMode("NONE")}
-                              className="mt-6 h-16 px-10 rounded-2xl border-2 border-zinc-200 font-black uppercase tracking-widest"
-                            >
-                              Back to POS
-                            </Button>
+                      {/* Column 2: Categories 6-10 (Always Visible) */}
+                      {CATEGORIES.length > 5 && (
+                        <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
+                          <div className="flex flex-col">
+                            {CATEGORIES.slice(5, 10).map((cat) => (
+                              <div key={cat}>
+                                <NavBlock 
+                                  label={cat} 
+                                  active={selectedCategory === cat} 
+                                  onClick={() => setSelectedCategory(cat)}
+                                />
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      ) : (
-                        <div className="flex-1 flex overflow-hidden">
-                          <>
-                            {/* Column 2: Categories 6-10 (Only at the top) */}
-                            {CATEGORIES.length > 5 && (
-                              <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
-                                <div className="flex flex-col">
-                                  {CATEGORIES.slice(5, 10).map((cat) => (
-                                    <div key={cat}>
-                                      <NavBlock 
-                                        label={cat} 
-                                        active={selectedCategory === cat} 
-                                        onClick={() => setSelectedCategory(cat)}
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                            <ProductGrid 
-                              onAddToCart={handleAddToCart} 
-                              selectedCategory={selectedCategory}
-                            />
-                          </>
-                        </div>
                       )}
+
+                      <div className="flex-1 relative overflow-hidden">
+                        {activeMode === "SPLIT" ? (
+                          <SplitView 
+                            mainCart={cart}
+                            splitCart={splitCart}
+                            exitRequested={exitWarningMode === "SPLIT"}
+                            onMoveToSplit={(item, qty) => {
+                              setCart(prev => {
+                                const existing = prev.find(i => i.cartItemId === item.cartItemId);
+                                if (!existing) return prev;
+                                if (existing.quantity === qty) return prev.filter(i => i.cartItemId !== item.cartItemId);
+                                return prev.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity - qty } : i);
+                              });
+                              setSplitCart(prev => {
+                                const existing = prev.find(i => i.cartItemId === item.cartItemId);
+                                if (existing) return prev.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity + qty } : i);
+                                return [...prev, { ...item, quantity: qty }];
+                              });
+                            }}
+                            onMoveToMain={(item, qty) => {
+                              setSplitCart(prev => {
+                                const existing = prev.find(i => i.cartItemId === item.cartItemId);
+                                if (!existing) return prev;
+                                if (existing.quantity === qty) return prev.filter(i => i.cartItemId !== item.cartItemId);
+                                return prev.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity - qty } : i);
+                              });
+                              setCart(prev => {
+                                const existing = prev.find(i => i.cartItemId === item.cartItemId);
+                                if (existing) return prev.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity + qty } : i);
+                                return [...prev, { ...item, quantity: qty }];
+                              });
+                            }}
+                            onPaySplit={() => {
+                              setSplitCart([]);
+                              setActiveMode("NONE");
+                              setExitWarningMode("NONE");
+                            }}
+                            onCancel={() => requestMode("NONE")}
+                            onConfirmExit={() => {
+                              // Return all items from splitCart to cart
+                              setCart(prev => {
+                                let newCart = [...prev];
+                                splitCart.forEach(item => {
+                                  const existing = newCart.find(i => i.cartItemId === item.cartItemId);
+                                  if (existing) {
+                                    newCart = newCart.map(i => i.cartItemId === item.cartItemId ? { ...i, quantity: i.quantity + item.quantity } : i);
+                                  } else {
+                                    newCart.push(item);
+                                  }
+                                });
+                                return newCart;
+                              });
+                              setSplitCart([]);
+                              setActiveMode(pendingMode);
+                              setExitWarningMode("NONE");
+                              setPendingMode("NONE");
+                            }}
+                            onCancelExit={() => {
+                              setExitWarningMode("NONE");
+                              setPendingMode("NONE");
+                            }}
+                          />
+                        ) : activeMode === "COUPON" ? (
+                          <CouponView 
+                            pendingValue={pendingQty}
+                            discounts={discounts}
+                            onRemoveDiscount={handleRemoveDiscount}
+                            exitRequested={exitWarningMode === "COUPON"}
+                            onApplyDiscount={(type, value, label) => {
+                              setDiscounts(prev => [...prev, { type, value, label }]);
+                              setPendingQty("");
+                              setCouponCode("");
+                            }}
+                            onCancel={() => requestMode("NONE")}
+                            onConfirmExit={() => {
+                              setPendingQty("");
+                              setCouponCode("");
+                              setActiveMode(pendingMode);
+                              setExitWarningMode("NONE");
+                              setPendingMode("NONE");
+                            }}
+                            onCancelExit={() => {
+                              setExitWarningMode("NONE");
+                              setPendingMode("NONE");
+                            }}
+                          />
+                        ) : activeMode === "TABLES" ? (
+                          <div className="flex-1 flex items-center justify-center bg-zinc-50">
+                            <div className="text-center space-y-4">
+                              <div className="w-24 h-24 bg-zinc-100 rounded-full flex items-center justify-center mx-auto">
+                                <Utensils className="w-12 h-12 text-zinc-300" />
+                              </div>
+                              <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-widest">Table Management</h3>
+                              <p className="text-zinc-400 font-medium">Select a table to start an order</p>
+                              <Button 
+                                variant="outline" 
+                                onClick={() => setActiveMode("NONE")}
+                                className="mt-6 h-16 px-10 rounded-2xl border-2 border-zinc-200 font-black uppercase tracking-widest"
+                              >
+                                Back to POS
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <ProductGrid 
+                            onAddToCart={handleAddToCart} 
+                            selectedCategory={selectedCategory}
+                          />
+                        )}
+                      </div>
                     </div>
 
                   {/* Bottom Area: Shortcuts and Number Pad (Always Visible) */}
@@ -387,9 +384,9 @@ export default function App() {
                       }}
                     />
                   </div>
-                  </div>
                 </div>
-              </main>
+              </div>
+            </main>
 
               {/* Right Section: Order Panel */}
               <OrderPanel 

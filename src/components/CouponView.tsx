@@ -64,7 +64,7 @@ export function CouponView({
                 <Button 
                   variant="outline"
                   onClick={() => setDiscountType('percentage')}
-                  className={`h-16 rounded-xl border-2 font-black text-sm gap-3 transition-all ${discountType === 'percentage' ? 'border-orange-500 bg-orange-500 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
+                  className={`h-16 rounded-xl border-2 font-black text-sm gap-3 transition-all ${discountType === 'percentage' ? 'border-zinc-700 bg-zinc-700 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
                 >
                   <Percent className="w-5 h-5 stroke-[3]" />
                   PERCENT
@@ -72,7 +72,7 @@ export function CouponView({
                 <Button 
                   variant="outline"
                   onClick={() => setDiscountType('fixed')}
-                  className={`h-16 rounded-xl border-2 font-black text-sm gap-3 transition-all ${discountType === 'fixed' ? 'border-orange-500 bg-orange-500 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
+                  className={`h-16 rounded-xl border-2 font-black text-sm gap-3 transition-all ${discountType === 'fixed' ? 'border-zinc-700 bg-zinc-700 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
                 >
                   <DollarSign className="w-5 h-5 stroke-[3]" />
                   FIXED
