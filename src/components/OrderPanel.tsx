@@ -1,4 +1,4 @@
-import { Trash2, Plus, Minus, UserPlus, CreditCard, Wallet, Banknote, ChevronUp, ChevronDown, Edit3, Copy, MessageSquare, BookOpen, UserCheck, XCircle } from "lucide-react";
+import { Trash2, Plus, Minus, UserPlus, CreditCard, Wallet, Banknote, ChevronUp, ChevronDown, Edit3, Copy, MessageSquare, BookOpen, UserCheck, XCircle, Tag } from "lucide-react";
 import { CartItem } from "@/src/types";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,20 +9,28 @@ import { useState, useRef, useEffect } from "react";
 
 interface OrderPanelProps {
   cart: CartItem[];
+  discounts: { type: 'percentage' | 'fixed', value: number, label: string }[];
   onUpdateQuantity: (cartItemId: string, delta: number) => void;
   onRemove: (cartItemId: string) => void;
   onClear: () => void;
   onCheckout: () => void;
 }
 
-export function OrderPanel({ cart, onUpdateQuantity, onRemove, onClear, onCheckout }: OrderPanelProps) {
+export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClear, onCheckout }: OrderPanelProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const tax = subtotal * 0.08;
-  const total = subtotal + tax;
+  
+  const discountAmount = discounts.reduce((acc, d) => {
+    if (d.type === 'percentage') return acc + (subtotal * (d.value / 100));
+    return acc + d.value;
+  }, 0);
+
+  const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+  const tax = discountedSubtotal * 0.08;
+  const total = discountedSubtotal + tax;
   const itemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const selectedIndex = cart.findIndex(item => item.cartItemId === selectedId);
@@ -124,6 +132,22 @@ export function OrderPanel({ cart, onUpdateQuantity, onRemove, onClear, onChecko
 
       {/* Fixed Footer */}
       <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0">
+        {discounts.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {discounts.map((d, i) => (
+              <div key={i} className="flex justify-between items-center text-orange-600">
+                <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <Tag className="w-3 h-3" />
+                  {d.label}
+                </span>
+                <span className="text-sm font-black tabular-nums">
+                  -{d.type === 'percentage' ? `${d.value}%` : `$${d.value.toFixed(2)}`}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
         <Button 
           onClick={onCheckout}
           className="w-full h-24 bg-zinc-900 hover:bg-zinc-800 text-white font-black text-2xl rounded-[2rem] shadow-xl shadow-zinc-200 active:scale-[0.98] transition-all"

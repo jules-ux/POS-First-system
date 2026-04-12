@@ -10,6 +10,7 @@ import { OrderPanel } from "./components/OrderPanel";
 import { StoreLogin } from "./components/StoreLogin";
 import { StaffLogin } from "./components/StaffLogin";
 import { SplitView } from "./components/SplitView";
+import { CouponView } from "./components/CouponView";
 import { Product, CartItem, Staff, PRODUCTS, CATEGORIES } from "@/src/types";
 import { AnimatePresence, motion } from "motion/react";
 import { Printer, DoorOpen, LogOut, Delete, CreditCard, Utensils, Copy, Badge, Edit3, MessageSquare, BookOpen, UserCheck, Plus, Trash2, Wallet, Users, Bell, Send, Banknote } from "lucide-react";
@@ -23,7 +24,9 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("FOOD");
   const [isSplitMode, setIsSplitMode] = useState(false);
+  const [isCouponMode, setIsCouponMode] = useState(false);
   const [splitCart, setSplitCart] = useState<CartItem[]>([]);
+  const [discounts, setDiscounts] = useState<{ type: 'percentage' | 'fixed', value: number, label: string }[]>([]);
 
   const [pendingQty, setPendingQty] = useState("");
   const [isNegative, setIsNegative] = useState(false);
@@ -63,6 +66,7 @@ export default function App() {
 
   const handleClearCart = () => {
     setCart([]);
+    setDiscounts([]);
   };
 
   const handleQuickSale = () => {
@@ -206,6 +210,19 @@ export default function App() {
                             setIsSplitMode(false);
                           }}
                         />
+                      ) : isCouponMode ? (
+                        <CouponView 
+                          pendingValue={pendingQty}
+                          onApplyDiscount={(type, value, label) => {
+                            setDiscounts(prev => [...prev, { type, value, label }]);
+                            setPendingQty("");
+                            setIsCouponMode(false);
+                          }}
+                          onCancel={() => {
+                            setPendingQty("");
+                            setIsCouponMode(false);
+                          }}
+                        />
                       ) : (
                         <>
                           {/* Column 2: Categories 6-10 (Only at the top) */}
@@ -245,7 +262,11 @@ export default function App() {
                           icon={Copy} 
                           onClick={() => setIsSplitMode(true)}
                         />
-                        <QuickShortcut label="COUPON" icon={Badge} />
+                        <QuickShortcut 
+                          label="COUPON" 
+                          icon={Badge} 
+                          onClick={() => setIsCouponMode(true)}
+                        />
                         
                         <QuickShortcut label="EDIT" icon={Edit3} accent />
                         <QuickShortcut label="REPEAT" icon={Copy} accent />
@@ -278,6 +299,7 @@ export default function App() {
                   {/* Right Section: Order Panel */}
                   <OrderPanel 
                     cart={cart} 
+                    discounts={discounts}
                     onUpdateQuantity={handleUpdateQuantity} 
                     onRemove={handleRemoveFromCart}
                     onClear={handleClearCart}
