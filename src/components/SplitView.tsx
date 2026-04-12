@@ -58,32 +58,32 @@ export function SplitView({
     <div className="flex-1 flex bg-zinc-50 overflow-hidden relative">
       {/* Left Column: Main Order */}
       <div className="flex-1 flex flex-col border-r border-zinc-200 bg-white">
-        <div className="p-6 border-b border-zinc-100 flex justify-between items-center">
+        <div className="p-6 border-b border-zinc-100 flex justify-between items-center shrink-0">
           <h3 className="text-sm font-black text-zinc-400 uppercase tracking-widest">Main Order</h3>
           <span className="text-xs font-bold text-zinc-400">{mainCart.length} items</span>
         </div>
-        <ScrollArea className="flex-1 min-h-0" viewportClassName="snap-y snap-mandatory">
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="p-4 space-y-2">
             {mainCart.map((item) => (
               <button
                 key={item.cartItemId}
                 onClick={() => handleItemClick(item, 'toSplit')}
-                className="w-full p-4 rounded-2xl border border-zinc-100 hover:border-zinc-900 hover:bg-zinc-50 flex justify-between items-center group transition-all"
+                className="w-full p-5 rounded-2xl border-2 border-zinc-50 bg-white hover:border-zinc-900 shadow-sm flex justify-between items-center group transition-all"
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-xl font-black text-zinc-900 tabular-nums">{item.quantity}x</span>
+                  <span className="text-2xl font-black text-zinc-900 tabular-nums">{item.quantity}x</span>
                   <span className="text-xl font-black tracking-tight text-zinc-900">{item.name.toUpperCase()}</span>
                 </div>
-                <ArrowRight className="w-6 h-6 text-zinc-200 group-hover:text-zinc-900" />
+                <ArrowRight className="w-6 h-6 text-zinc-200 group-hover:text-zinc-900 stroke-[2.5]" />
               </button>
             ))}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Right Column: Split Order (Wider Gray Area) */}
       <div className="flex-[1.4] flex flex-col bg-zinc-100/50">
-        <div className="p-8 border-b border-zinc-200 flex justify-between items-center bg-white">
+        <div className="p-8 border-b border-zinc-200 flex justify-between items-center bg-white shrink-0">
           <div className="space-y-1">
             <h3 className="text-base font-black text-zinc-900 uppercase tracking-widest">Partial Bill</h3>
             <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Items to be paid separately</p>
@@ -93,12 +93,12 @@ export function SplitView({
             Cancel
           </Button>
         </div>
-        <ScrollArea className="flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="p-6 space-y-3">
             {splitCart.length === 0 ? (
-              <div className="py-20 text-center border-2 border-dashed border-zinc-200 rounded-[2rem] flex flex-col items-center gap-4">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                  <ArrowRight className="w-8 h-8 text-zinc-200" />
+              <div className="h-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-zinc-200 rounded-[2rem] gap-4">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <ArrowRight className="w-10 h-10 text-zinc-200" />
                 </div>
                 <p className="text-zinc-400 font-black uppercase tracking-widest text-sm">Transfer items here</p>
               </div>
@@ -107,20 +107,20 @@ export function SplitView({
                 <button
                   key={item.cartItemId}
                   onClick={() => handleItemClick(item, 'toMain')}
-                  className="w-full p-5 rounded-2xl border-2 border-white bg-white hover:border-zinc-900 shadow-sm flex justify-between items-center group transition-all"
+                  className="w-full p-6 rounded-2xl border-2 border-white bg-white hover:border-zinc-900 shadow-sm flex justify-between items-center group transition-all"
                 >
                   <ArrowLeft className="w-6 h-6 text-zinc-200 group-hover:text-zinc-900 stroke-[2.5]" />
                   <div className="flex items-center gap-4 text-right">
                     <span className="text-xl font-black tracking-tight text-zinc-900">{item.name.toUpperCase()}</span>
-                    <span className="text-2xl font-black text-orange-500 tabular-nums">{item.quantity}x</span>
+                    <span className="text-3xl font-black text-orange-500 tabular-nums">{item.quantity}x</span>
                   </div>
                 </button>
               ))
             )}
           </div>
-        </ScrollArea>
+        </div>
         
-        <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
+        <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] shrink-0">
           <div className="flex justify-between items-center">
             <div className="space-y-1">
               <span className="text-sm font-black text-zinc-400 uppercase tracking-widest block">Partial Total</span>

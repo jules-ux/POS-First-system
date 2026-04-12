@@ -96,20 +96,20 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
 
   return (
     <div className="w-full lg:w-[580px] h-full max-h-full bg-white border-l border-zinc-200 flex flex-col overflow-hidden relative">
-      <div className="p-8 border-b border-zinc-200 flex items-center justify-between bg-white z-10 shrink-0">
+      <div className="h-40 px-8 border-b border-zinc-200 flex items-center justify-between bg-white z-10 shrink-0">
         <div>
-          <h2 className="text-3xl font-black text-zinc-900 tracking-tight">Current Order</h2>
-          <p className="text-base text-zinc-400 font-bold">Order #8429 • Today</p>
+          <h2 className="text-2xl font-black text-zinc-900 tracking-tight leading-none mb-1">Current Order</h2>
+          <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">Order #8429 • Today</p>
         </div>
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => moveSelection('up')} className="w-16 h-16 text-zinc-400 hover:text-zinc-900">
-            <ChevronUp className="w-12 h-12 stroke-[3]" />
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => moveSelection('up')} className="w-14 h-14 text-zinc-400 hover:text-zinc-900">
+            <ChevronUp className="w-10 h-10 stroke-[3]" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => moveSelection('down')} className="w-16 h-16 text-zinc-400 hover:text-zinc-900">
-            <ChevronDown className="w-12 h-12 stroke-[3]" />
+          <Button variant="ghost" size="icon" onClick={() => moveSelection('down')} className="w-14 h-14 text-zinc-400 hover:text-zinc-900">
+            <ChevronDown className="w-10 h-10 stroke-[3]" />
           </Button>
           
-          <div className="relative ml-4">
+          <div className="relative ml-2">
             <Button 
               variant="ghost" 
               size="icon"
@@ -117,12 +117,16 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
               onPointerUp={handleTrashEnd}
               onPointerLeave={handleTrashEnd}
               onClick={handleTrashClick}
-              className={`w-16 h-16 transition-all relative overflow-hidden ${selectedId ? 'text-red-500 hover:bg-red-50' : 'text-zinc-300 cursor-not-allowed'}`}
+              className={`w-16 h-16 transition-all relative overflow-hidden rounded-2xl border-2 ${
+                selectedId 
+                  ? 'text-red-600 border-red-100 bg-red-50 hover:bg-red-100 hover:border-red-200' 
+                  : 'text-zinc-200 border-zinc-50 cursor-not-allowed'
+              }`}
             >
-              <Trash2 className="w-10 h-10 stroke-[2.5] relative z-10" />
+              <Trash2 className="w-8 h-8 stroke-[2.5] relative z-10" />
               {longPressProgress > 0 && (
                 <div 
-                  className="absolute bottom-0 left-0 w-full bg-red-100 transition-all duration-75"
+                  className="absolute bottom-0 left-0 w-full bg-red-200 transition-all duration-75"
                   style={{ height: `${longPressProgress}%` }}
                 />
               )}

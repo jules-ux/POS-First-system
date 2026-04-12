@@ -46,7 +46,7 @@ export function CouponView({
     <div className="flex-1 flex bg-zinc-50 overflow-hidden relative">
       {/* Left Column: Custom Discount & Applied Discounts */}
       <div className="flex-1 flex flex-col border-r border-zinc-200 bg-white">
-        <div className="p-6 border-b border-zinc-100 flex justify-between items-center">
+        <div className="p-6 border-b border-zinc-100 flex justify-between items-center shrink-0">
           <h3 className="text-base font-black text-zinc-400 uppercase tracking-widest">Discounts</h3>
           <Button variant="ghost" size="sm" onClick={onCancel} className="text-zinc-400 hover:text-red-500 font-black uppercase tracking-widest text-sm">
             <XCircle className="w-6 h-6 mr-2 stroke-[2.5]" />
@@ -54,7 +54,7 @@ export function CouponView({
           </Button>
         </div>
         
-        <ScrollArea className="flex-1">
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="p-6 space-y-8">
             {/* Custom Discount (Shrunk) */}
             <div className="space-y-4">
@@ -128,15 +128,15 @@ export function CouponView({
               )}
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Right Column: Active Promotions (Compact & Full Width) */}
       <div className="flex-1 flex flex-col bg-zinc-50/50 min-w-0">
-        <div className="p-6 border-b border-zinc-200 bg-white">
+        <div className="p-6 border-b border-zinc-200 bg-white shrink-0">
           <h3 className="text-base font-black text-zinc-400 uppercase tracking-widest">Promotions</h3>
         </div>
-        <ScrollArea className="flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="p-4 space-y-2">
             {ACTIVE_PROMOS.map((promo) => (
               <button
@@ -151,7 +151,7 @@ export function CouponView({
               </button>
             ))}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Exit Confirmation Overlay */}
