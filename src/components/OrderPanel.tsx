@@ -12,9 +12,10 @@ interface OrderPanelProps {
   onUpdateQuantity: (cartItemId: string, delta: number) => void;
   onRemove: (cartItemId: string) => void;
   onClear: () => void;
+  onCheckout: () => void;
 }
 
-export function OrderPanel({ cart, onUpdateQuantity, onRemove, onClear }: OrderPanelProps) {
+export function OrderPanel({ cart, onUpdateQuantity, onRemove, onClear, onCheckout }: OrderPanelProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -123,7 +124,10 @@ export function OrderPanel({ cart, onUpdateQuantity, onRemove, onClear }: OrderP
 
       {/* Fixed Footer */}
       <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0">
-        <Button className="w-full h-24 bg-zinc-900 hover:bg-zinc-800 text-white font-black text-2xl rounded-[2rem] shadow-xl shadow-zinc-200 active:scale-[0.98] transition-all">
+        <Button 
+          onClick={onCheckout}
+          className="w-full h-24 bg-zinc-900 hover:bg-zinc-800 text-white font-black text-2xl rounded-[2rem] shadow-xl shadow-zinc-200 active:scale-[0.98] transition-all"
+        >
           COMPLETE CHECKOUT
         </Button>
 
