@@ -17,16 +17,18 @@ import { Printer, DoorOpen, LogOut, Delete, CreditCard, Utensils, Copy, Badge, E
 import { Button } from "@/components/ui/button";
 
 type AppStep = "store-login" | "staff-login" | "pos";
+type POSMode = "NONE" | "SPLIT" | "COUPON" | "TABLES";
 
 export default function App() {
   const [step, setStep] = useState<AppStep>("store-login");
   const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("FOOD");
-  const [isSplitMode, setIsSplitMode] = useState(false);
-  const [splitExitRequested, setSplitExitRequested] = useState(false);
-  const [couponExitRequested, setCouponExitRequested] = useState(false);
-  const [isCouponMode, setIsCouponMode] = useState(false);
+  
+  const [activeMode, setActiveMode] = useState<POSMode>("NONE");
+  const [pendingMode, setPendingMode] = useState<POSMode>("NONE");
+  const [exitWarningMode, setExitWarningMode] = useState<POSMode>("NONE");
+
   const [splitCart, setSplitCart] = useState<CartItem[]>([]);
   const [couponCode, setCouponCode] = useState("");
   const [discounts, setDiscounts] = useState<{ type: 'percentage' | 'fixed', value: number, label: string }[]>([]);
@@ -72,6 +74,33 @@ export default function App() {
     setDiscounts([]);
   };
 
+  const hasChanges = (mode: POSMode) => {
+    if (mode === "SPLIT") return splitCart.length > 0;
+    if (mode === "COUPON") return pendingQty !== "" || couponCode !== "";
+    return false;
+  };
+
+  const requestMode = (mode: POSMode) => {
+    if (activeMode === mode) {
+      if (hasChanges(mode)) {
+        setPendingMode("NONE");
+        setExitWarningMode(mode);
+      } else {
+        setActiveMode("NONE");
+      }
+      return;
+    }
+
+    if (activeMode !== "NONE" && hasChanges(activeMode)) {
+      setPendingMode(mode);
+      setExitWarningMode(activeMode);
+    } else {
+      setActiveMode(mode);
+      setPendingMode("NONE");
+      setExitWarningMode("NONE");
+    }
+  };
+
   const handleQuickSale = () => {
     if (cart.length === 0) return;
     // In a real app, this would send to printer/backend
@@ -79,34 +108,6 @@ export default function App() {
     setPendingQty("");
     setIsNegative(false);
     setStep("pos");
-  };
-
-  const handleSplitClick = () => {
-    if (isSplitMode) {
-      if (splitCart.length === 0) {
-        setIsSplitMode(false);
-        setSplitExitRequested(false);
-      } else {
-        setSplitExitRequested(true);
-      }
-    } else {
-      setIsSplitMode(true);
-      setSplitExitRequested(false);
-    }
-  };
-
-  const handleCouponClick = () => {
-    if (isCouponMode) {
-      if (!pendingQty && !couponCode) {
-        setIsCouponMode(false);
-        setCouponExitRequested(false);
-      } else {
-        setCouponExitRequested(true);
-      }
-    } else {
-      setIsCouponMode(true);
-      setCouponExitRequested(false);
-    }
   };
 
   const handleCompleteCheckout = () => {
@@ -186,14 +187,14 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Middle Section: Product Grid, Second Category Column, and Bottom Panel */}
+                   {/* Middle Section: Product Grid, Second Category Column, and Bottom Panel */}
                   <div className="flex-1 flex flex-col min-w-0">
                     <div className="flex-1 flex overflow-hidden">
-                      {isSplitMode ? (
+                      {activeMode === "SPLIT" ? (
                         <SplitView 
                           mainCart={cart}
                           splitCart={splitCart}
-                          exitRequested={splitExitRequested}
+                          exitRequested={exitWarningMode === "SPLIT"}
                           onMoveToSplit={(item, qty) => {
                             setCart(prev => {
                               const existing = prev.find(i => i.cartItemId === item.cartItemId);
@@ -222,17 +223,10 @@ export default function App() {
                           }}
                           onPaySplit={() => {
                             setSplitCart([]);
-                            setIsSplitMode(false);
-                            setSplitExitRequested(false);
+                            setActiveMode("NONE");
+                            setExitWarningMode("NONE");
                           }}
-                          onCancel={() => {
-                            if (splitCart.length === 0) {
-                              setIsSplitMode(false);
-                              setSplitExitRequested(false);
-                            } else {
-                              setSplitExitRequested(true);
-                            }
-                          }}
+                          onCancel={() => requestMode("NONE")}
                           onConfirmExit={() => {
                             // Return all items from splitCart to cart
                             setCart(prev => {
@@ -248,39 +242,40 @@ export default function App() {
                               return newCart;
                             });
                             setSplitCart([]);
-                            setIsSplitMode(false);
-                            setSplitExitRequested(false);
+                            setActiveMode(pendingMode);
+                            setExitWarningMode("NONE");
+                            setPendingMode("NONE");
                           }}
-                          onCancelExit={() => setSplitExitRequested(false)}
+                          onCancelExit={() => {
+                            setExitWarningMode("NONE");
+                            setPendingMode("NONE");
+                          }}
                         />
-                      ) : isCouponMode ? (
+                      ) : activeMode === "COUPON" ? (
                         <CouponView 
                           pendingValue={pendingQty}
                           couponCode={couponCode}
                           onCouponCodeChange={setCouponCode}
-                          exitRequested={couponExitRequested}
+                          exitRequested={exitWarningMode === "COUPON"}
                           onApplyDiscount={(type, value, label) => {
                             setDiscounts(prev => [...prev, { type, value, label }]);
                             setPendingQty("");
                             setCouponCode("");
-                            setIsCouponMode(false);
-                            setCouponExitRequested(false);
+                            setActiveMode("NONE");
+                            setExitWarningMode("NONE");
                           }}
-                          onCancel={() => {
-                            if (!pendingQty && !couponCode) {
-                              setIsCouponMode(false);
-                              setCouponExitRequested(false);
-                            } else {
-                              setCouponExitRequested(true);
-                            }
-                          }}
+                          onCancel={() => requestMode("NONE")}
                           onConfirmExit={() => {
                             setPendingQty("");
                             setCouponCode("");
-                            setIsCouponMode(false);
-                            setCouponExitRequested(false);
+                            setActiveMode(pendingMode);
+                            setExitWarningMode("NONE");
+                            setPendingMode("NONE");
                           }}
-                          onCancelExit={() => setCouponExitRequested(false)}
+                          onCancelExit={() => {
+                            setExitWarningMode("NONE");
+                            setPendingMode("NONE");
+                          }}
                         />
                       ) : (
                         <>
@@ -315,18 +310,23 @@ export default function App() {
                           active 
                           onClick={handleQuickSale}
                         />
-                        <QuickShortcut label="TABLES" icon={Utensils} />
+                        <QuickShortcut 
+                          label="TABLES" 
+                          icon={Utensils} 
+                          active={activeMode === "TABLES"}
+                          onClick={() => requestMode("TABLES")}
+                        />
                         <QuickShortcut 
                           label="SPLIT" 
                           icon={Copy} 
-                          active={isSplitMode}
-                          onClick={handleSplitClick}
+                          active={activeMode === "SPLIT"}
+                          onClick={() => requestMode("SPLIT")}
                         />
                         <QuickShortcut 
                           label="COUPON" 
                           icon={Badge} 
-                          active={isCouponMode}
-                          onClick={handleCouponClick}
+                          active={activeMode === "COUPON"}
+                          onClick={() => requestMode("COUPON")}
                         />
                         
                         <QuickShortcut label="EDIT" icon={Edit3} accent />
