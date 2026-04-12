@@ -6,8 +6,13 @@ import { motion, AnimatePresence } from "motion/react";
 
 interface CouponViewProps {
   pendingValue: string;
+  couponCode: string;
+  onCouponCodeChange: (code: string) => void;
+  exitRequested?: boolean;
   onApplyDiscount: (type: 'percentage' | 'fixed', value: number, label: string) => void;
   onCancel: () => void;
+  onConfirmExit?: () => void;
+  onCancelExit?: () => void;
 }
 
 const ACTIVE_PROMOS = [
@@ -19,8 +24,16 @@ const ACTIVE_PROMOS = [
   { id: 'weekend-spec', label: 'WEEKEND SPECIAL - $10', type: 'fixed', value: 10 },
 ];
 
-export function CouponView({ pendingValue, onApplyDiscount, onCancel }: CouponViewProps) {
-  const [couponCode, setCouponCode] = useState("");
+export function CouponView({ 
+  pendingValue, 
+  couponCode,
+  onCouponCodeChange,
+  exitRequested = false,
+  onApplyDiscount, 
+  onCancel,
+  onConfirmExit,
+  onCancelExit
+}: CouponViewProps) {
   const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
 
   const handleApplyCustom = () => {
@@ -53,7 +66,7 @@ export function CouponView({ pendingValue, onApplyDiscount, onCancel }: CouponVi
                     type="text" 
                     placeholder="E.G. SUMMER24"
                     value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    onChange={(e) => onCouponCodeChange(e.target.value.toUpperCase())}
                     className="bg-transparent border-none outline-none w-full font-black text-2xl placeholder:text-zinc-200"
                   />
                 </div>
@@ -132,6 +145,54 @@ export function CouponView({ pendingValue, onApplyDiscount, onCancel }: CouponVi
           </div>
         </ScrollArea>
       </div>
+      {/* Exit Confirmation Overlay */}
+      <AnimatePresence>
+        {exitRequested && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[60] bg-white flex items-center justify-center p-10"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="max-w-lg w-full flex flex-col gap-10 text-center"
+            >
+              <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+                <XCircle className="w-12 h-12 text-red-500 stroke-[2.5]" />
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="text-sm font-black text-zinc-400 uppercase tracking-[0.3em]">Unsaved Changes</h4>
+                <p className="text-4xl font-black text-zinc-900 leading-tight">
+                  Do you really want to close it because there are changes made?
+                </p>
+                <p className="text-lg text-zinc-400 font-medium">
+                  Your current coupon code or custom discount entry will be cleared.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <Button
+                  onClick={onConfirmExit}
+                  className="h-24 bg-red-500 hover:bg-red-600 text-white rounded-3xl font-black text-2xl shadow-xl shadow-red-100 active:scale-[0.98] transition-all"
+                >
+                  YES, CLOSE COUPON
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={onCancelExit}
+                  className="h-20 text-zinc-400 hover:text-zinc-900 font-black text-xl uppercase tracking-widest"
+                >
+                  NO, STAY HERE
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

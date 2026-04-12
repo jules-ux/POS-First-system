@@ -8,19 +8,25 @@ import { motion, AnimatePresence } from "motion/react";
 interface SplitViewProps {
   mainCart: CartItem[];
   splitCart: CartItem[];
+  exitRequested?: boolean;
   onMoveToSplit: (item: CartItem, qty: number) => void;
   onMoveToMain: (item: CartItem, qty: number) => void;
   onPaySplit: () => void;
   onCancel: () => void;
+  onConfirmExit?: () => void;
+  onCancelExit?: () => void;
 }
 
 export function SplitView({ 
   mainCart, 
   splitCart, 
+  exitRequested = false,
   onMoveToSplit, 
   onMoveToMain, 
   onPaySplit, 
-  onCancel 
+  onCancel,
+  onConfirmExit,
+  onCancelExit
 }: SplitViewProps) {
   const [pendingMove, setPendingMove] = useState<{ item: CartItem; direction: 'toSplit' | 'toMain' } | null>(null);
   const [moveQty, setMoveQty] = useState("");
@@ -172,6 +178,55 @@ export function SplitView({
               >
                 Cancel
               </Button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Exit Confirmation Overlay */}
+      <AnimatePresence>
+        {exitRequested && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[60] bg-white flex items-center justify-center p-10"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="max-w-lg w-full flex flex-col gap-10 text-center"
+            >
+              <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+                <XCircle className="w-12 h-12 text-red-500 stroke-[2.5]" />
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="text-sm font-black text-zinc-400 uppercase tracking-[0.3em]">Unsaved Changes</h4>
+                <p className="text-4xl font-black text-zinc-900 leading-tight">
+                  Do you really want to close it because there are changes made?
+                </p>
+                <p className="text-lg text-zinc-400 font-medium">
+                  All items in the partial bill will be moved back to the main order.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <Button
+                  onClick={onConfirmExit}
+                  className="h-24 bg-red-500 hover:bg-red-600 text-white rounded-3xl font-black text-2xl shadow-xl shadow-red-100 active:scale-[0.98] transition-all"
+                >
+                  YES, CLOSE SPLIT
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={onCancelExit}
+                  className="h-20 text-zinc-400 hover:text-zinc-900 font-black text-xl uppercase tracking-widest"
+                >
+                  NO, STAY HERE
+                </Button>
+              </div>
             </motion.div>
           </motion.div>
         )}

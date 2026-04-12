@@ -24,8 +24,11 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("FOOD");
   const [isSplitMode, setIsSplitMode] = useState(false);
+  const [splitExitRequested, setSplitExitRequested] = useState(false);
+  const [couponExitRequested, setCouponExitRequested] = useState(false);
   const [isCouponMode, setIsCouponMode] = useState(false);
   const [splitCart, setSplitCart] = useState<CartItem[]>([]);
+  const [couponCode, setCouponCode] = useState("");
   const [discounts, setDiscounts] = useState<{ type: 'percentage' | 'fixed', value: number, label: string }[]>([]);
 
   const [pendingQty, setPendingQty] = useState("");
@@ -76,6 +79,34 @@ export default function App() {
     setPendingQty("");
     setIsNegative(false);
     setStep("pos");
+  };
+
+  const handleSplitClick = () => {
+    if (isSplitMode) {
+      if (splitCart.length === 0) {
+        setIsSplitMode(false);
+        setSplitExitRequested(false);
+      } else {
+        setSplitExitRequested(true);
+      }
+    } else {
+      setIsSplitMode(true);
+      setSplitExitRequested(false);
+    }
+  };
+
+  const handleCouponClick = () => {
+    if (isCouponMode) {
+      if (!pendingQty && !couponCode) {
+        setIsCouponMode(false);
+        setCouponExitRequested(false);
+      } else {
+        setCouponExitRequested(true);
+      }
+    } else {
+      setIsCouponMode(true);
+      setCouponExitRequested(false);
+    }
   };
 
   const handleCompleteCheckout = () => {
@@ -162,6 +193,7 @@ export default function App() {
                         <SplitView 
                           mainCart={cart}
                           splitCart={splitCart}
+                          exitRequested={splitExitRequested}
                           onMoveToSplit={(item, qty) => {
                             setCart(prev => {
                               const existing = prev.find(i => i.cartItemId === item.cartItemId);
@@ -191,8 +223,17 @@ export default function App() {
                           onPaySplit={() => {
                             setSplitCart([]);
                             setIsSplitMode(false);
+                            setSplitExitRequested(false);
                           }}
                           onCancel={() => {
+                            if (splitCart.length === 0) {
+                              setIsSplitMode(false);
+                              setSplitExitRequested(false);
+                            } else {
+                              setSplitExitRequested(true);
+                            }
+                          }}
+                          onConfirmExit={() => {
                             // Return all items from splitCart to cart
                             setCart(prev => {
                               let newCart = [...prev];
@@ -208,20 +249,38 @@ export default function App() {
                             });
                             setSplitCart([]);
                             setIsSplitMode(false);
+                            setSplitExitRequested(false);
                           }}
+                          onCancelExit={() => setSplitExitRequested(false)}
                         />
                       ) : isCouponMode ? (
                         <CouponView 
                           pendingValue={pendingQty}
+                          couponCode={couponCode}
+                          onCouponCodeChange={setCouponCode}
+                          exitRequested={couponExitRequested}
                           onApplyDiscount={(type, value, label) => {
                             setDiscounts(prev => [...prev, { type, value, label }]);
                             setPendingQty("");
+                            setCouponCode("");
                             setIsCouponMode(false);
+                            setCouponExitRequested(false);
                           }}
                           onCancel={() => {
-                            setPendingQty("");
-                            setIsCouponMode(false);
+                            if (!pendingQty && !couponCode) {
+                              setIsCouponMode(false);
+                              setCouponExitRequested(false);
+                            } else {
+                              setCouponExitRequested(true);
+                            }
                           }}
+                          onConfirmExit={() => {
+                            setPendingQty("");
+                            setCouponCode("");
+                            setIsCouponMode(false);
+                            setCouponExitRequested(false);
+                          }}
+                          onCancelExit={() => setCouponExitRequested(false)}
                         />
                       ) : (
                         <>
@@ -260,12 +319,14 @@ export default function App() {
                         <QuickShortcut 
                           label="SPLIT" 
                           icon={Copy} 
-                          onClick={() => setIsSplitMode(true)}
+                          active={isSplitMode}
+                          onClick={handleSplitClick}
                         />
                         <QuickShortcut 
                           label="COUPON" 
                           icon={Badge} 
-                          onClick={() => setIsCouponMode(true)}
+                          active={isCouponMode}
+                          onClick={handleCouponClick}
                         />
                         
                         <QuickShortcut label="EDIT" icon={Edit3} accent />
