@@ -18,8 +18,12 @@ interface OrderPanelProps {
 
 export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClear, onCheckout }: OrderPanelProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [longPressProgress, setLongPressProgress] = useState(0);
+  const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  const LONG_PRESS_DURATION = 5000; // 5 seconds
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   
@@ -56,6 +60,40 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
     setSelectedId(cart[newIndex].cartItemId);
   };
 
+  const isLongPress = useRef(false);
+
+  const handleTrashStart = () => {
+    isLongPress.current = false;
+    setLongPressProgress(0);
+    const startTime = Date.now();
+    
+    progressInterval.current = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min((elapsed / LONG_PRESS_DURATION) * 100, 100);
+      setLongPressProgress(progress);
+      
+      if (elapsed >= LONG_PRESS_DURATION) {
+        isLongPress.current = true;
+        onClear();
+        handleTrashEnd();
+      }
+    }, 50);
+  };
+
+  const handleTrashEnd = () => {
+    if (progressInterval.current) clearInterval(progressInterval.current);
+    progressInterval.current = null;
+    // Don't reset progress immediately so onClick can check it
+    setTimeout(() => setLongPressProgress(0), 100);
+  };
+
+  const handleTrashClick = () => {
+    if (!isLongPress.current && selectedId) {
+      onRemove(selectedId);
+      setSelectedId(null);
+    }
+  };
+
   return (
     <div className="w-full lg:w-[480px] h-full max-h-full bg-white border-l border-zinc-200 flex flex-col overflow-hidden relative">
       <div className="p-8 border-b border-zinc-200 flex items-center justify-between bg-white z-10 shrink-0">
@@ -70,9 +108,26 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
           <Button variant="ghost" size="icon" onClick={() => moveSelection('down')} className="w-16 h-16 text-zinc-400 hover:text-zinc-900">
             <ChevronDown className="w-12 h-12 stroke-[3]" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={onClear} className="text-zinc-400 hover:text-red-500 ml-4 font-black uppercase tracking-widest text-sm">
-            Clear
-          </Button>
+          
+          <div className="relative ml-4">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onPointerDown={handleTrashStart}
+              onPointerUp={handleTrashEnd}
+              onPointerLeave={handleTrashEnd}
+              onClick={handleTrashClick}
+              className={`w-16 h-16 transition-all relative overflow-hidden ${selectedId ? 'text-red-500 hover:bg-red-50' : 'text-zinc-300 cursor-not-allowed'}`}
+            >
+              <Trash2 className="w-10 h-10 stroke-[2.5] relative z-10" />
+              {longPressProgress > 0 && (
+                <div 
+                  className="absolute bottom-0 left-0 w-full bg-red-100 transition-all duration-75"
+                  style={{ height: `${longPressProgress}%` }}
+                />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -132,21 +187,33 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
 
       {/* Fixed Footer */}
       <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0">
-        {discounts.length > 0 && (
-          <div className="flex flex-col gap-3">
-            {discounts.map((d, i) => (
-              <div key={i} className="flex justify-between items-center text-orange-600">
-                <span className="text-xs font-black uppercase tracking-widest flex items-center gap-3">
-                  <Tag className="w-4 h-4 stroke-[3]" />
-                  {d.label}
-                </span>
-                <span className="text-lg font-black tabular-nums">
-                  -{d.type === 'percentage' ? `${d.value}%` : `$${d.value.toFixed(2)}`}
-                </span>
-              </div>
-            ))}
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center text-zinc-400">
+            <span className="text-xs font-black uppercase tracking-widest">Subtotal</span>
+            <span className="text-lg font-black tabular-nums">${subtotal.toFixed(2)}</span>
           </div>
-        )}
+          
+          {discounts.length > 0 && (
+            <div className="flex flex-col gap-2 py-2 border-y border-zinc-50">
+              {discounts.map((d, i) => (
+                <div key={i} className="flex justify-between items-center text-orange-600">
+                  <span className="text-xs font-black uppercase tracking-widest flex items-center gap-3">
+                    <Tag className="w-4 h-4 stroke-[3]" />
+                    {d.label}
+                  </span>
+                  <span className="text-lg font-black tabular-nums">
+                    -{d.type === 'percentage' ? `${d.value}%` : `$${d.value.toFixed(2)}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex justify-between items-center text-zinc-400">
+            <span className="text-xs font-black uppercase tracking-widest">Tax (8%)</span>
+            <span className="text-lg font-black tabular-nums">${tax.toFixed(2)}</span>
+          </div>
+        </div>
 
         <Button 
           onClick={onCheckout}
@@ -166,6 +233,7 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
           </div>
         </div>
       </div>
+
     </div>
   );
 }

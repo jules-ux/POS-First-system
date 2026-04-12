@@ -19,6 +19,13 @@ import { Button } from "@/components/ui/button";
 type AppStep = "store-login" | "staff-login" | "pos";
 type POSMode = "NONE" | "SPLIT" | "COUPON" | "TABLES";
 
+const randomId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+};
+
 export default function App() {
   const [step, setStep] = useState<AppStep>("store-login");
   const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
@@ -47,7 +54,7 @@ export default function App() {
 
     setCart((prev) => [
       ...prev,
-      { ...product, cartItemId: crypto.randomUUID(), quantity: finalQty }
+      { ...product, cartItemId: randomId(), quantity: finalQty }
     ]);
 
     // Reset quantity selection
@@ -112,7 +119,11 @@ export default function App() {
 
   const handleCompleteCheckout = () => {
     if (cart.length === 0) return;
-    // For now, just a placeholder as requested to remove the previous view
+    setStep("checkout");
+  };
+
+  const handleRemoveDiscount = (index: number) => {
+    setDiscounts(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -159,8 +170,8 @@ export default function App() {
               <main className="flex-1 flex flex-col min-w-0">
                 <TopBar staff={currentStaff} />
                 <div className="flex-1 flex overflow-hidden">
-                  {/* Left Section: Column 1 (Fixed) */}
-                  <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-hidden">
+                  {/* Left Section: Column 1 (Fixed) - ALWAYS VISIBLE */}
+                  <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-hidden shrink-0">
                     <div className="flex flex-col">
                       {CATEGORIES.slice(0, 5).map((cat) => (
                         <div key={cat}>
@@ -187,8 +198,8 @@ export default function App() {
                     </div>
                   </div>
 
-                   {/* Middle Section: Product Grid, Second Category Column, and Bottom Panel */}
-                  <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex-1 flex flex-col overflow-hidden">
+                    {/* Top Area: Categories + Product Grid OR Mode Views */}
                     <div className="flex-1 flex overflow-hidden">
                       {activeMode === "SPLIT" ? (
                         <SplitView 
@@ -254,8 +265,8 @@ export default function App() {
                       ) : activeMode === "COUPON" ? (
                         <CouponView 
                           pendingValue={pendingQty}
-                          couponCode={couponCode}
-                          onCouponCodeChange={setCouponCode}
+                          discounts={discounts}
+                          onRemoveDiscount={handleRemoveDiscount}
                           exitRequested={exitWarningMode === "COUPON"}
                           onApplyDiscount={(type, value, label) => {
                             setDiscounts(prev => [...prev, { type, value, label }]);
@@ -277,97 +288,118 @@ export default function App() {
                             setPendingMode("NONE");
                           }}
                         />
-                      ) : (
-                        <>
-                          {/* Column 2: Categories 6-10 (Only at the top) */}
-                          {CATEGORIES.length > 5 && (
-                            <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
-                              <div className="flex flex-col">
-                                {CATEGORIES.slice(5, 10).map((cat) => (
-                                  <div key={cat}>
-                                    <NavBlock 
-                                      label={cat} 
-                                      active={selectedCategory === cat} 
-                                      onClick={() => setSelectedCategory(cat)}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
+                      ) : activeMode === "TABLES" ? (
+                        <div className="flex-1 flex items-center justify-center bg-zinc-50">
+                          <div className="text-center space-y-4">
+                            <div className="w-24 h-24 bg-zinc-100 rounded-full flex items-center justify-center mx-auto">
+                              <Utensils className="w-12 h-12 text-zinc-300" />
                             </div>
-                          )}
-                          <ProductGrid 
-                            onAddToCart={handleAddToCart} 
-                            selectedCategory={selectedCategory}
-                          />
-                        </>
+                            <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-widest">Table Management</h3>
+                            <p className="text-zinc-400 font-medium">Select a table to start an order</p>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => setActiveMode("NONE")}
+                              className="mt-6 h-16 px-10 rounded-2xl border-2 border-zinc-200 font-black uppercase tracking-widest"
+                            >
+                              Back to POS
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex overflow-hidden">
+                          <>
+                            {/* Column 2: Categories 6-10 (Only at the top) */}
+                            {CATEGORIES.length > 5 && (
+                              <div className="w-32 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
+                                <div className="flex flex-col">
+                                  {CATEGORIES.slice(5, 10).map((cat) => (
+                                    <div key={cat}>
+                                      <NavBlock 
+                                        label={cat} 
+                                        active={selectedCategory === cat} 
+                                        onClick={() => setSelectedCategory(cat)}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            <ProductGrid 
+                              onAddToCart={handleAddToCart} 
+                              selectedCategory={selectedCategory}
+                            />
+                          </>
+                        </div>
                       )}
                     </div>
-                    <div className="h-[512px] border-t border-zinc-200 bg-white flex">
-                      <div className="flex-1 p-6 grid grid-cols-4 grid-rows-4 gap-3">
-                        <QuickShortcut 
-                          label="QUICK SALE" 
-                          icon={CreditCard} 
-                          active 
-                          onClick={handleQuickSale}
-                        />
-                        <QuickShortcut 
-                          label="TABLES" 
-                          icon={Utensils} 
-                          active={activeMode === "TABLES"}
-                          onClick={() => requestMode("TABLES")}
-                        />
-                        <QuickShortcut 
-                          label="SPLIT" 
-                          icon={Copy} 
-                          active={activeMode === "SPLIT"}
-                          onClick={() => requestMode("SPLIT")}
-                        />
-                        <QuickShortcut 
-                          label="COUPON" 
-                          icon={Badge} 
-                          active={activeMode === "COUPON"}
-                          onClick={() => requestMode("COUPON")}
-                        />
-                        
-                        <QuickShortcut label="EDIT" icon={Edit3} accent />
-                        <QuickShortcut label="REPEAT" icon={Copy} accent />
-                        <QuickShortcut label="NOTES" icon={MessageSquare} accent />
-                        <QuickShortcut label="RECIPES" icon={BookOpen} accent />
-                        
-                        <QuickShortcut label="SEAT REV" icon={UserCheck} />
-                        <QuickShortcut label="CUSTOM" icon={Plus} />
-                        <QuickShortcut label="REFUND" icon={Trash2} />
-                        <QuickShortcut label="GIFT" icon={Wallet} />
 
-                        <QuickShortcut label="REPRINT" icon={Printer} />
-                        <QuickShortcut label="MANAGER" icon={Users} />
-                        <QuickShortcut label="SETTINGS" icon={LogOut} />
-                        <QuickShortcut label="HELP" icon={Bell} />
-                      </div>
-                      <NumberPad 
-                        value={pendingQty} 
-                        isNegative={isNegative}
-                        onValueChange={setPendingQty}
-                        onToggleNegative={() => setIsNegative(!isNegative)}
-                        onClear={() => {
-                          setPendingQty("");
-                          setIsNegative(false);
-                        }}
+                  {/* Bottom Area: Shortcuts and Number Pad (Always Visible) */}
+                  <div className="h-[512px] border-t border-zinc-200 bg-white flex shrink-0">
+                    <div className="flex-1 p-6 grid grid-cols-4 grid-rows-4 gap-3">
+                      <QuickShortcut 
+                        label="QUICK SALE" 
+                        icon={CreditCard} 
+                        orange
+                        onClick={handleQuickSale}
                       />
-                    </div>
-                  </div>
+                      <QuickShortcut 
+                        label="TABLES" 
+                        icon={Utensils} 
+                        active={activeMode === "TABLES"}
+                        onClick={() => requestMode("TABLES")}
+                      />
+                      <QuickShortcut 
+                        label="SPLIT" 
+                        icon={Copy} 
+                        active={activeMode === "SPLIT"}
+                        onClick={() => requestMode("SPLIT")}
+                      />
+                      <QuickShortcut 
+                        label="COUPON" 
+                        icon={Badge} 
+                        active={activeMode === "COUPON"}
+                        onClick={() => requestMode("COUPON")}
+                      />
+                      
+                      <QuickShortcut label="EDIT" icon={Edit3} accent />
+                      <QuickShortcut label="REPEAT" icon={Copy} accent />
+                      <QuickShortcut label="NOTES" icon={MessageSquare} accent />
+                      <QuickShortcut label="RECIPES" icon={BookOpen} accent />
+                      
+                      <QuickShortcut label="SEAT REV" icon={UserCheck} />
+                      <QuickShortcut label="CUSTOM" icon={Plus} />
+                      <QuickShortcut label="REFUND" icon={Trash2} />
+                      <QuickShortcut label="GIFT" icon={Wallet} />
 
-                  {/* Right Section: Order Panel */}
-                  <OrderPanel 
-                    cart={cart} 
-                    discounts={discounts}
-                    onUpdateQuantity={handleUpdateQuantity} 
-                    onRemove={handleRemoveFromCart}
-                    onClear={handleClearCart}
-                    onCheckout={handleCompleteCheckout}
-                  />
+                      <QuickShortcut label="REPRINT" icon={Printer} />
+                      <QuickShortcut label="MANAGER" icon={Users} />
+                      <QuickShortcut label="SETTINGS" icon={LogOut} />
+                      <QuickShortcut label="HELP" icon={Bell} />
+                    </div>
+                    <NumberPad 
+                      value={pendingQty} 
+                      isNegative={isNegative}
+                      onValueChange={setPendingQty}
+                      onToggleNegative={() => setIsNegative(!isNegative)}
+                      onClear={() => {
+                        setPendingQty("");
+                        setIsNegative(false);
+                      }}
+                    />
+                  </div>
+                  </div>
                 </div>
               </main>
+
+              {/* Right Section: Order Panel */}
+              <OrderPanel 
+                cart={cart} 
+                discounts={discounts}
+                onUpdateQuantity={handleUpdateQuantity} 
+                onRemove={handleRemoveFromCart}
+                onClear={handleClearCart}
+                onCheckout={handleCompleteCheckout}
+              />
             </div>
           </motion.div>
         )}
@@ -406,7 +438,15 @@ export default function App() {
                     <div className="mt-auto pt-8 border-t border-zinc-100 flex justify-between items-end">
                       <span className="text-sm font-black text-zinc-400 uppercase tracking-widest">Total Amount</span>
                       <span className="text-6xl font-black text-orange-500 tabular-nums tracking-tighter">
-                        ${(cart.reduce((acc, item) => acc + item.price * item.quantity, 0) * 1.08).toFixed(2)}
+                        ${(() => {
+                          const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+                          const discountAmount = discounts.reduce((acc, d) => {
+                            if (d.type === 'percentage') return acc + (subtotal * (d.value / 100));
+                            return acc + d.value;
+                          }, 0);
+                          const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+                          return (discountedSubtotal * 1.08).toFixed(2);
+                        })()}
                       </span>
                     </div>
                   </div>
@@ -523,19 +563,21 @@ function ActionBlock({ icon: Icon, label, onClick }: { icon: any, label: string,
   );
 }
 
-function QuickShortcut({ label, icon: Icon, active = false, accent = false, onClick }: { label: string, icon?: any, active?: boolean, accent?: boolean, onClick?: () => void }) {
+function QuickShortcut({ label, icon: Icon, active = false, accent = false, orange = false, onClick }: { label: string, icon?: any, active?: boolean, accent?: boolean, orange?: boolean, onClick?: () => void }) {
   return (
     <button 
       onClick={onClick}
       className={`h-full w-full border rounded-3xl flex flex-col items-center justify-center gap-3 transition-none group ${
-      active 
+      active && !orange
         ? "bg-zinc-900 border-zinc-950 text-white shadow-xl shadow-zinc-200" 
-        : accent
-          ? "bg-zinc-50 border-zinc-100 text-zinc-600 hover:border-zinc-300"
-          : "bg-white border-zinc-200 text-zinc-400 hover:border-zinc-400 hover:text-zinc-900"
+        : orange
+          ? "bg-white border-zinc-200 text-orange-500 hover:border-orange-500"
+          : accent
+            ? "bg-zinc-50 border-zinc-100 text-zinc-600 hover:border-zinc-300"
+            : "bg-white border-zinc-200 text-zinc-400 hover:border-zinc-400 hover:text-zinc-900"
     }`}>
-      {Icon && <Icon className={`w-10 h-10 stroke-[2.5] ${active ? "text-white" : accent ? "text-zinc-500" : "text-zinc-300 group-hover:text-zinc-500"}`} />}
-      <span className={`text-xs font-black tracking-widest uppercase ${active ? "text-white" : accent ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-900"}`}>{label}</span>
+      {Icon && <Icon className={`w-10 h-10 stroke-[2.5] ${active && !orange ? "text-white" : orange ? "text-orange-500" : accent ? "text-zinc-500" : "text-zinc-300 group-hover:text-zinc-500"}`} />}
+      <span className={`text-xs font-black tracking-widest uppercase ${active && !orange ? "text-white" : orange ? "text-orange-600" : accent ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-900"}`}>{label}</span>
     </button>
   );
 }
