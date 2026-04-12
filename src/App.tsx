@@ -7,7 +7,7 @@ import { useState } from "react";
 import { TopBar } from "./components/TopBar";
 import { ProductGrid } from "./components/ProductGrid";
 import { OrderPanel } from "./components/OrderPanel";
-import { ShoppingCart, X, Menu, SplitSquareHorizontal, Tag, Minus, XCircle, LayoutDashboard } from "lucide-react";
+import { ShoppingCart, X, Menu, SplitSquareHorizontal, Tag, Minus, XCircle, LayoutDashboard, Store } from "lucide-react";
 import { StoreLogin } from "./components/StoreLogin";
 import { StaffLogin } from "./components/StaffLogin";
 import { SplitView } from "./components/SplitView";
@@ -27,6 +27,239 @@ const randomId = () => {
   return Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
 };
 
+// --- DESKTOP SPECIFIC COMPONENTS ---
+
+function DesktopNavBlock({ label, active, onClick }: { label: string; active?: boolean; onClick?: () => void; key?: string | number }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`w-[10vh] h-[10vh] flex flex-col items-center justify-center gap-[1vh] border-b border-zinc-200 transition-colors shrink-0
+        ${active ? 'bg-zinc-900 text-white' : 'bg-zinc-50 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'}
+      `}
+    >
+      <span className="text-[1.2vh] font-black uppercase tracking-widest text-center px-[1vh]">{label}</span>
+    </button>
+  );
+}
+
+function DesktopActionBlock({ icon: Icon, label, onClick }: { icon: any; label: string; onClick?: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      className="w-[10vh] h-[10vh] flex flex-col items-center justify-center gap-[1vh] bg-zinc-50 text-zinc-500 border-b border-zinc-200 hover:bg-zinc-100 hover:text-zinc-900 transition-colors shrink-0"
+    >
+      <Icon className="w-[3vh] h-[3vh]" />
+      <span className="text-[1vh] font-black uppercase tracking-widest">{label}</span>
+    </button>
+  );
+}
+
+function DesktopQuickShortcut({ label, icon: Icon, accent, orange, active, onClick }: { label: string; icon: any; accent?: boolean; orange?: boolean; active?: boolean; onClick?: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`
+        w-[10vh] h-[10vh] flex flex-col items-center justify-center gap-[1vh] border-r border-b border-zinc-200 transition-all shrink-0
+        ${active ? 'border-zinc-900 bg-zinc-900 text-white' : 
+          orange ? 'border-orange-500 bg-orange-500 text-white hover:bg-orange-600' :
+          accent ? 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200' : 
+          'bg-white text-zinc-600 hover:bg-zinc-50'}
+      `}
+    >
+      <Icon className={`w-[3vh] h-[3vh] ${active || orange ? 'text-white' : accent ? 'text-zinc-900' : 'text-zinc-400'}`} />
+      <span className="text-[1vh] font-black uppercase tracking-widest">{label}</span>
+    </button>
+  );
+}
+
+function DesktopProductGrid({ onAddToCart, selectedCategory }: { onAddToCart: (p: Product) => void, selectedCategory: string }) {
+  const filteredProducts = PRODUCTS.filter(p => p.category === selectedCategory);
+  
+  return (
+    <div className="flex-1 overflow-y-auto bg-zinc-50 custom-scrollbar p-[2vh]">
+      <div className="flex flex-wrap gap-[2vh] pb-[10vh]">
+        {filteredProducts.map((product) => (
+          <button 
+            key={product.id}
+            onClick={() => onAddToCart(product)}
+            className="w-[10vh] h-[10vh] bg-white rounded-[2vh] border border-zinc-200 flex flex-col items-center justify-center text-center gap-[1vh] transition-all active:scale-95 group shrink-0"
+          >
+            <div className="flex flex-col gap-[0.5vh]">
+              <span className="font-black text-zinc-900 text-[1.4vh] leading-tight px-[1vh]">{product.name}</span>
+              <span className="text-zinc-500 font-black text-[1.6vh]">Qty: {product.stock}</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DesktopNumberPad({ value, isNegative, onValueChange, onToggleNegative, onClear }: any) {
+  const handleNumber = (num: string) => {
+    if (value.length < 4) {
+      onValueChange(value + num);
+    }
+  };
+
+  return (
+    <div className="w-[30vh] h-full bg-white text-zinc-900 flex flex-col shrink-0 border-l border-zinc-200">
+      <div className="flex-1 grid grid-cols-3 grid-rows-4">
+        {[7, 8, 9, 4, 5, 6, 1, 2, 3].map((num) => (
+          <button
+            key={num}
+            onClick={() => handleNumber(num.toString())}
+            className="border-r border-b border-zinc-200 text-[4vh] font-black hover:bg-zinc-100 active:bg-zinc-200 transition-colors"
+          >
+            {num}
+          </button>
+        ))}
+        <button
+          onClick={onToggleNegative}
+          className="border-r border-zinc-200 text-[3.5vh] font-black hover:bg-zinc-100 active:bg-zinc-200 transition-colors text-zinc-400"
+        >
+          +/-
+        </button>
+        <button
+          onClick={() => handleNumber("0")}
+          className="border-r border-zinc-200 text-[4vh] font-black hover:bg-zinc-100 active:bg-zinc-200 transition-colors"
+        >
+          0
+        </button>
+        <button
+          onClick={onClear}
+          className="text-[3.5vh] font-black hover:bg-zinc-100 active:bg-zinc-200 transition-colors text-red-500"
+        >
+          C
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function DesktopOrderPanel({ cart, discounts, onRemoveSelected, selectedItemId, onSelect, onClear, onCheckout }: any) {
+  const subtotal = cart.reduce((acc: number, item: any) => acc + item.price * item.quantity, 0);
+  const discountAmount = discounts.reduce((acc: number, d: any) => {
+    if (d.type === 'percentage') return acc + (subtotal * (d.value / 100));
+    return acc + d.value;
+  }, 0);
+  const total = Math.max(0, subtotal - discountAmount);
+
+  return (
+    <aside className="w-[40vh] bg-white border-l border-zinc-200 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.02)]">
+      <div className="h-[10vh] px-[2vh] flex items-center justify-between border-b border-zinc-200 bg-zinc-50/50 shrink-0">
+        <div className="flex items-center gap-[1vh]">
+          <ShoppingCart className="w-[2.5vh] h-[2.5vh] text-zinc-900" />
+          <h2 className="font-black text-[2vh] text-zinc-900 tracking-tight">Current Order</h2>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onRemoveSelected} className="text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-[1.5vh] h-[4vh] w-[4vh]">
+          <Trash2 className="w-[2vh] h-[2vh]" />
+        </Button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-[2vh] flex flex-col gap-[1vh] custom-scrollbar">
+        {cart.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-zinc-400 gap-[2vh]">
+            <ShoppingCart className="w-[6vh] h-[6vh] opacity-20" />
+            <p className="font-black uppercase tracking-widest text-[1.2vh]">Cart is empty</p>
+          </div>
+        ) : (
+          cart.map((item: any) => (
+            <button 
+              key={item.cartItemId} 
+              onClick={() => onSelect(item.cartItemId)}
+              className={`bg-white border rounded-[2vh] p-[1.5vh] flex flex-col gap-[1.5vh] shadow-sm transition-all ${selectedItemId === item.cartItemId ? 'border-orange-500 ring-2 ring-orange-200' : 'border-zinc-200'}`}
+            >
+              <div className="flex justify-between items-start gap-[1vh]">
+                <span className="font-black text-zinc-900 text-[1.6vh] leading-tight">{item.name}</span>
+                <span className="font-black text-zinc-500 text-[1.6vh]">Qty: {item.quantity}</span>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+
+      {discounts.length > 0 && (
+        <div className="max-h-[20vh] overflow-y-auto border-t border-zinc-200 bg-orange-50/30 p-[2vh] flex flex-col gap-[1vh] custom-scrollbar shrink-0">
+          <h3 className="text-[1vh] font-black text-orange-600 uppercase tracking-widest">Applied Discounts</h3>
+          {discounts.map((discount: any, idx: number) => (
+            <div key={idx} className="flex justify-between items-center bg-white border border-orange-100 rounded-[1vh] p-[1vh] shadow-sm">
+              <span className="text-[1.2vh] font-bold text-orange-900">{discount.label}</span>
+              <span className="text-[1.2vh] font-black text-orange-600">
+                -{discount.type === 'percentage' ? `${discount.value}%` : `$${discount.value.toFixed(2)}`}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="bg-white border-t border-zinc-200 p-[2vh] flex flex-col gap-[2vh] shrink-0 shadow-[0_-20px_40px_rgba(0,0,0,0.02)]">
+        <div className="flex flex-col gap-[1vh]">
+          <div className="flex justify-between items-center text-zinc-500">
+            <span className="text-[1.4vh] font-bold">Subtotal</span>
+            <span className="text-[1.4vh] font-black">${subtotal.toFixed(2)}</span>
+          </div>
+          {discountAmount > 0 && (
+            <div className="flex justify-between items-center text-orange-500">
+              <span className="text-[1.4vh] font-bold">Discount</span>
+              <span className="text-[1.4vh] font-black">-${discountAmount.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="flex justify-between items-center pt-[1vh] border-t border-zinc-100">
+            <span className="text-[2vh] font-black text-zinc-900">Total</span>
+            <span className="text-[3vh] font-black text-orange-500 tracking-tighter">${total.toFixed(2)}</span>
+          </div>
+        </div>
+        
+        <Button 
+          className="w-full h-[8vh] text-[2vh] font-black rounded-[2vh] bg-zinc-900 hover:bg-zinc-800 text-white shadow-xl shadow-zinc-200 transition-all active:scale-95"
+          onClick={onCheckout}
+          disabled={cart.length === 0}
+        >
+          CHECKOUT
+        </Button>
+      </div>
+    </aside>
+  );
+}
+
+function DesktopTopBar({ staff }: { staff: Staff | null }) {
+  return (
+    <header className="h-[10vh] bg-white border-b border-zinc-200 flex items-center justify-between px-[3vh] shrink-0 z-10">
+      <div className="flex items-center gap-[2vh]">
+        <div className="w-[5vh] h-[5vh] bg-zinc-900 rounded-[1.5vh] flex items-center justify-center shadow-lg shadow-zinc-200">
+          <Store className="w-[2.5vh] h-[2.5vh] text-white" />
+        </div>
+        <div className="flex flex-col">
+          <h1 className="text-[2vh] font-black text-zinc-900 tracking-tight leading-none">Lumina POS</h1>
+          <span className="text-[1.2vh] font-bold text-zinc-400 uppercase tracking-widest mt-[0.5vh]">Terminal 01</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-[2vh]">
+        <div className="flex items-center gap-[1.5vh] bg-zinc-50 px-[2vh] py-[1vh] rounded-[1.5vh] border border-zinc-200">
+          <div className="w-[1vh] h-[1vh] rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"></div>
+          <span className="text-[1.2vh] font-black text-zinc-600 uppercase tracking-widest">System Online</span>
+        </div>
+        
+        {staff && (
+          <div className="flex items-center gap-[1.5vh] pl-[2vh] border-l border-zinc-200">
+            <div className="flex flex-col items-end">
+              <span className="text-[1.4vh] font-black text-zinc-900 leading-none">{staff.name}</span>
+              <span className="text-[1vh] font-bold text-zinc-400 uppercase tracking-widest mt-[0.5vh]">{staff.role}</span>
+            </div>
+            <div className="w-[5vh] h-[5vh] rounded-[1.5vh] bg-orange-100 border-2 border-orange-200 flex items-center justify-center">
+              <span className="text-[1.6vh] font-black text-orange-700">
+                {staff.name.split(' ').map((n: string) => n[0]).join('')}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
+
 export default function App() {
   const [step, setStep] = useState<AppStep>("store-login");
   const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
@@ -40,6 +273,7 @@ export default function App() {
   const [splitCart, setSplitCart] = useState<CartItem[]>([]);
   const [couponCode, setCouponCode] = useState("");
   const [discounts, setDiscounts] = useState<{ type: 'percentage' | 'fixed', value: number, label: string }[]>([]);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const [pendingQty, setPendingQty] = useState("");
   const [isNegative, setIsNegative] = useState(false);
@@ -666,38 +900,28 @@ export default function App() {
             </div>
             {/* --- DESKTOP VIEW (>= 1024px) --- */}
             <div 
-              className="hidden lg:block absolute top-0 left-0 overflow-hidden"
-              style={{ 
-                width: '212.77%', 
-                height: '212.77%', 
-                minWidth: '212.77%',
-                minHeight: '212.77%',
-                transform: 'scale(0.47)',
-                transformOrigin: 'top left'
-              }}
+              className="hidden lg:flex absolute top-0 left-0 w-full h-full bg-zinc-50 overflow-hidden"
             >
-              <div className="w-full h-full flex">
               <main className="flex-1 flex flex-col min-w-0">
-                <TopBar staff={currentStaff} />
+                <DesktopTopBar staff={currentStaff} />
                 <div className="flex-1 flex overflow-hidden">
                   {/* Left Section: Column 1 (Fixed) - ALWAYS VISIBLE */}
-                  <div className="w-40 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-hidden shrink-0">
+                  <div className="w-[10vh] flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-hidden shrink-0">
                     <div className="flex flex-col">
                       {CATEGORIES.slice(0, 5).map((cat) => (
-                        <div key={cat}>
-                          <NavBlock 
-                            label={cat} 
-                            active={selectedCategory === cat} 
-                            onClick={() => setSelectedCategory(cat)}
-                          />
-                        </div>
+                        <DesktopNavBlock 
+                          key={cat}
+                          label={cat} 
+                          active={selectedCategory === cat} 
+                          onClick={() => setSelectedCategory(cat)}
+                        />
                       ))}
                     </div>
                     <div className="mt-auto border-t border-zinc-200 flex flex-col">
-                      <ActionBlock icon={Send} label="SEND" />
-                      <ActionBlock icon={Printer} label="PRINT" />
-                      <ActionBlock icon={DoorOpen} label="DRAWER" />
-                      <ActionBlock 
+                      <DesktopActionBlock icon={Send} label="SEND" />
+                      <DesktopActionBlock icon={Printer} label="PRINT" />
+                      <DesktopActionBlock icon={DoorOpen} label="DRAWER" />
+                      <DesktopActionBlock 
                         icon={LogOut} 
                         label="OUT" 
                         onClick={() => {
@@ -713,16 +937,15 @@ export default function App() {
                     <div className="flex-1 flex overflow-hidden">
                       {/* Column 2: Categories 6-10 (Always Visible) */}
                       {CATEGORIES.length > 5 && (
-                        <div className="w-40 flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
+                        <div className="w-[10vh] flex flex-col bg-zinc-50 border-r border-zinc-200 overflow-y-auto scrollbar-hide">
                           <div className="flex flex-col">
                             {CATEGORIES.slice(5, 10).map((cat) => (
-                              <div key={cat}>
-                                <NavBlock 
-                                  label={cat} 
-                                  active={selectedCategory === cat} 
-                                  onClick={() => setSelectedCategory(cat)}
-                                />
-                              </div>
+                              <DesktopNavBlock 
+                                key={cat}
+                                label={cat} 
+                                active={selectedCategory === cat} 
+                                onClick={() => setSelectedCategory(cat)}
+                              />
                             ))}
                           </div>
                         </div>
@@ -767,7 +990,6 @@ export default function App() {
                             }}
                             onCancel={() => requestMode("NONE")}
                             onConfirmExit={() => {
-                              // Return all items from splitCart to cart
                               setCart(prev => {
                                 let newCart = [...prev];
                                 splitCart.forEach(item => {
@@ -832,7 +1054,7 @@ export default function App() {
                             </div>
                           </div>
                         ) : (
-                          <ProductGrid 
+                          <DesktopProductGrid 
                             onAddToCart={handleAddToCart} 
                             selectedCategory={selectedCategory}
                           />
@@ -840,74 +1062,59 @@ export default function App() {
                       </div>
                     </div>
 
-                  {/* Bottom Area: Shortcuts and Number Pad (Always Visible) */}
-                  <div className="h-[640px] border-t border-zinc-200 bg-white flex shrink-0">
-                    <div className="flex-1 p-6 grid grid-cols-4 grid-rows-4 gap-3">
-                      <QuickShortcut 
-                        label="QUICK SALE" 
-                        icon={CreditCard} 
-                        orange
-                        onClick={handleQuickSale}
-                      />
-                      <QuickShortcut 
-                        label="TABLES" 
-                        icon={Utensils} 
-                        active={activeMode === "TABLES"}
-                        onClick={() => requestMode("TABLES")}
-                      />
-                      <QuickShortcut 
-                        label="SPLIT" 
-                        icon={Copy} 
-                        active={activeMode === "SPLIT"}
-                        onClick={() => requestMode("SPLIT")}
-                      />
-                      <QuickShortcut 
-                        label="COUPON" 
-                        icon={Badge} 
-                        active={activeMode === "COUPON"}
-                        onClick={() => requestMode("COUPON")}
-                      />
-                      
-                      <QuickShortcut label="EDIT" icon={Edit3} accent />
-                      <QuickShortcut label="REPEAT" icon={Copy} accent />
-                      <QuickShortcut label="NOTES" icon={MessageSquare} accent />
-                      <QuickShortcut label="RECIPES" icon={BookOpen} accent />
-                      
-                      <QuickShortcut label="SEAT REV" icon={UserCheck} />
-                      <QuickShortcut label="CUSTOM" icon={Plus} />
-                      <QuickShortcut label="REFUND" icon={Trash2} />
-                      <QuickShortcut label="GIFT" icon={Wallet} />
+                    {/* Bottom Area: Shortcuts and Number Pad (Always Visible) */}
+                    <div className="h-[40vh] border-t border-zinc-200 bg-white flex shrink-0">
+                      <div className="flex-1 grid grid-cols-[repeat(auto-fill,10vh)] grid-rows-4 content-start">
+                        <DesktopQuickShortcut label="QUICK SALE" icon={CreditCard} orange onClick={handleQuickSale} />
+                        <DesktopQuickShortcut label="TABLES" icon={Utensils} active={activeMode === "TABLES"} onClick={() => requestMode("TABLES")} />
+                        <DesktopQuickShortcut label="SPLIT" icon={Copy} active={activeMode === "SPLIT"} onClick={() => requestMode("SPLIT")} />
+                        <DesktopQuickShortcut label="COUPON" icon={Badge} active={activeMode === "COUPON"} onClick={() => requestMode("COUPON")} />
+                        
+                        <DesktopQuickShortcut label="EDIT" icon={Edit3} accent />
+                        <DesktopQuickShortcut label="REPEAT" icon={Copy} accent />
+                        <DesktopQuickShortcut label="NOTES" icon={MessageSquare} accent />
+                        <DesktopQuickShortcut label="RECIPES" icon={BookOpen} accent />
+                        
+                        <DesktopQuickShortcut label="SEAT REV" icon={UserCheck} />
+                        <DesktopQuickShortcut label="CUSTOM" icon={Plus} />
+                        <DesktopQuickShortcut label="REFUND" icon={Trash2} />
+                        <DesktopQuickShortcut label="GIFT" icon={Wallet} />
 
-                      <QuickShortcut label="REPRINT" icon={Printer} />
-                      <QuickShortcut label="MANAGER" icon={Users} />
-                      <QuickShortcut label="SETTINGS" icon={LogOut} />
-                      <QuickShortcut label="HELP" icon={Bell} />
+                        <DesktopQuickShortcut label="REPRINT" icon={Printer} />
+                        <DesktopQuickShortcut label="MANAGER" icon={Users} />
+                        <DesktopQuickShortcut label="SETTINGS" icon={LogOut} />
+                        <DesktopQuickShortcut label="HELP" icon={Bell} />
+                      </div>
+                      <DesktopNumberPad 
+                        value={pendingQty} 
+                        isNegative={isNegative}
+                        onValueChange={setPendingQty}
+                        onToggleNegative={() => setIsNegative(!isNegative)}
+                        onClear={() => {
+                          setPendingQty("");
+                          setIsNegative(false);
+                        }}
+                      />
                     </div>
-                    <NumberPad 
-                      value={pendingQty} 
-                      isNegative={isNegative}
-                      onValueChange={setPendingQty}
-                      onToggleNegative={() => setIsNegative(!isNegative)}
-                      onClear={() => {
-                        setPendingQty("");
-                        setIsNegative(false);
-                      }}
-                    />
                   </div>
                 </div>
-              </div>
-            </main>
+              </main>
 
               {/* Right Section: Order Panel */}
-              <OrderPanel 
+              <DesktopOrderPanel 
                 cart={cart} 
                 discounts={discounts}
-                onUpdateQuantity={handleUpdateQuantity} 
-                onRemove={handleRemoveFromCart}
+                onRemoveSelected={() => {
+                  if (selectedItemId) {
+                    handleRemoveFromCart(selectedItemId);
+                    setSelectedItemId(null);
+                  }
+                }}
+                selectedItemId={selectedItemId}
+                onSelect={setSelectedItemId}
                 onClear={handleClearCart}
                 onCheckout={handleCompleteCheckout}
               />
-            </div>
             </div>
           </motion.div>
         )}

@@ -19,12 +19,13 @@ export interface Staff {
   number: string; // 3-digit number like 101
   name: string;
   pin: string; // 4-digit PIN
+  role?: string;
 }
 
 export const STAFF_MEMBERS: Staff[] = [
-  { id: "1", number: "101", name: "Alex", pin: "1234" },
-  { id: "2", number: "202", name: "Sarah", pin: "1111" },
-  { id: "3", number: "303", name: "James", pin: "2222" },
+  { id: "1", number: "101", name: "Alex", pin: "1234", role: "Manager" },
+  { id: "2", number: "202", name: "Sarah", pin: "1111", role: "Cashier" },
+  { id: "3", number: "303", name: "James", pin: "2222", role: "Cashier" },
   { id: "4", number: "404", name: "Emma", pin: "3333" },
   { id: "5", number: "505", name: "Michael", pin: "4444" },
   { id: "6", number: "606", name: "Olivia", pin: "5555" },
