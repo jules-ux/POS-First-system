@@ -30,7 +30,7 @@ export function OrderPanel({ cart, onUpdateQuantity, onRemove, onClear }: OrderP
     if (selectedId) {
       const element = itemRefs.current.get(selectedId);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
   }, [selectedId]);
@@ -67,8 +67,8 @@ export function OrderPanel({ cart, onUpdateQuantity, onRemove, onClear }: OrderP
         </div>
       </div>
 
-      <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-0 px-6">
-        <div className="py-8 space-y-1">
+      <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-0" viewportClassName="snap-y snap-mandatory">
+        <div className="py-0">
           <AnimatePresence mode="popLayout">
             {cart.length === 0 ? (
               <motion.div 
@@ -94,22 +94,22 @@ export function OrderPanel({ cart, onUpdateQuantity, onRemove, onClear }: OrderP
                   transition={{ duration: 0 }}
                   onPointerEnter={() => setSelectedId(item.cartItemId)}
                   onClick={() => setSelectedId(item.cartItemId)}
-                  className={`mx-2 p-6 rounded-2xl cursor-pointer transition-none relative group ${
+                  className={`w-full px-8 py-4 cursor-pointer transition-none relative group border-b border-zinc-50 snap-start snap-always ${
                     selectedId === item.cartItemId ? "bg-zinc-100" : "hover:bg-zinc-50"
                   }`}
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <span className="text-xs font-black text-zinc-300 shrink-0">
+                      <span className="text-[10px] font-black text-zinc-300 shrink-0 tabular-nums">
                         {String(index + 1).padStart(2, '0')}
                       </span>
-                      <h4 className="text-2xl font-black tracking-tight truncate text-zinc-900">
+                      <h4 className="text-xl font-black tracking-tight truncate text-zinc-900">
                         {item.name.toUpperCase()}
                       </h4>
                     </div>
                     
                     <div className="flex items-center shrink-0">
-                      <span className="text-3xl font-black tabular-nums text-zinc-900">
+                      <span className="text-2xl font-black tabular-nums text-zinc-900">
                         {item.quantity}
                       </span>
                     </div>
