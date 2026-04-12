@@ -166,11 +166,11 @@ export default function App() {
             transition={{ duration: 0 }}
             className="absolute top-0 left-0 overflow-hidden"
             style={{ 
-              width: '200%', 
-              height: '200%', 
-              minWidth: '200%',
-              minHeight: '200%',
-              transform: 'scale(0.50)',
+              width: '212.77%', 
+              height: '212.77%', 
+              minWidth: '212.77%',
+              minHeight: '212.77%',
+              transform: 'scale(0.47)',
               transformOrigin: 'top left'
             }}
           >
