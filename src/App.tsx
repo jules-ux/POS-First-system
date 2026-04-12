@@ -166,7 +166,7 @@ function DesktopOrderPanel({ cart, discounts, onRemoveSelected, selectedItemId, 
           cart.map((item: any) => (
             <button 
               key={item.cartItemId} 
-              onClick={() => onSelect(item.cartItemId)}
+              onMouseEnter={() => onSelect(item.cartItemId)}
               className={`w-full p-[1vh] border-b border-zinc-200 text-left transition-all flex justify-between items-center ${selectedItemId === item.cartItemId ? 'bg-orange-100' : 'bg-white'}`}
             >
               <span className="font-black text-zinc-900 text-[1.6vh] leading-none">{item.name}</span>
