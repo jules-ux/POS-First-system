@@ -81,44 +81,59 @@ export function SplitView({
         </ScrollArea>
       </div>
 
-      {/* Right Column: Split Order */}
-      <div className="flex-1 flex flex-col bg-zinc-50/50">
-        <div className="p-6 border-b border-zinc-200 flex justify-between items-center bg-white">
-          <h3 className="text-sm font-black text-zinc-400 uppercase tracking-widest">Partial Bill</h3>
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-zinc-400 hover:text-red-500 font-bold uppercase tracking-widest text-xs">
-            <XCircle className="w-5 h-5 mr-2" />
+      {/* Right Column: Split Order (Wider Gray Area) */}
+      <div className="flex-[1.4] flex flex-col bg-zinc-100/50">
+        <div className="p-8 border-b border-zinc-200 flex justify-between items-center bg-white">
+          <div className="space-y-1">
+            <h3 className="text-base font-black text-zinc-900 uppercase tracking-widest">Partial Bill</h3>
+            <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Items to be paid separately</p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onCancel} className="text-zinc-400 hover:text-red-500 font-black uppercase tracking-widest text-sm">
+            <XCircle className="w-6 h-6 mr-2 stroke-[2.5]" />
             Cancel
           </Button>
         </div>
-        <ScrollArea className="flex-1 min-h-0" viewportClassName="snap-y snap-mandatory">
-          <div className="p-4 space-y-2">
-            {splitCart.map((item) => (
-              <button
-                key={item.cartItemId}
-                onClick={() => handleItemClick(item, 'toMain')}
-                className="w-full p-4 rounded-2xl border border-zinc-200 bg-white hover:border-zinc-900 flex justify-between items-center group transition-all"
-              >
-                <ArrowLeft className="w-6 h-6 text-zinc-200 group-hover:text-zinc-900" />
-                <div className="flex items-center gap-4 text-right">
-                  <span className="text-xl font-black tracking-tight text-zinc-900">{item.name.toUpperCase()}</span>
-                  <span className="text-xl font-black text-zinc-900 tabular-nums">{item.quantity}x</span>
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-6 space-y-3">
+            {splitCart.length === 0 ? (
+              <div className="py-20 text-center border-2 border-dashed border-zinc-200 rounded-[2rem] flex flex-col items-center gap-4">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <ArrowRight className="w-8 h-8 text-zinc-200" />
                 </div>
-              </button>
-            ))}
+                <p className="text-zinc-400 font-black uppercase tracking-widest text-sm">Transfer items here</p>
+              </div>
+            ) : (
+              splitCart.map((item) => (
+                <button
+                  key={item.cartItemId}
+                  onClick={() => handleItemClick(item, 'toMain')}
+                  className="w-full p-5 rounded-2xl border-2 border-white bg-white hover:border-zinc-900 shadow-sm flex justify-between items-center group transition-all"
+                >
+                  <ArrowLeft className="w-6 h-6 text-zinc-200 group-hover:text-zinc-900 stroke-[2.5]" />
+                  <div className="flex items-center gap-4 text-right">
+                    <span className="text-xl font-black tracking-tight text-zinc-900">{item.name.toUpperCase()}</span>
+                    <span className="text-2xl font-black text-orange-500 tabular-nums">{item.quantity}x</span>
+                  </div>
+                </button>
+              ))
+            )}
           </div>
         </ScrollArea>
         
-        <div className="p-6 bg-white border-t border-zinc-200 flex flex-col gap-4">
-          <div className="flex justify-between items-end">
-            <span className="text-xs font-black text-zinc-400 uppercase tracking-widest">Partial Total</span>
-            <span className="text-4xl font-black text-orange-500 tabular-nums tracking-tighter">${splitTotal.toFixed(2)}</span>
+        <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <span className="text-sm font-black text-zinc-400 uppercase tracking-widest block">Partial Total</span>
+              <span className="text-xs font-bold text-zinc-300 uppercase tracking-widest">Including 8% Tax</span>
+            </div>
+            <span className="text-6xl font-black text-orange-500 tabular-nums tracking-tighter">${splitTotal.toFixed(2)}</span>
           </div>
           <Button 
             disabled={splitCart.length === 0}
             onClick={onPaySplit}
-            className="w-full h-20 bg-orange-500 hover:bg-orange-600 text-white font-black text-xl rounded-2xl shadow-lg shadow-orange-100 disabled:opacity-50 active:scale-[0.98] transition-all"
+            className="w-full h-24 bg-orange-500 hover:bg-orange-600 text-white font-black text-2xl rounded-[2rem] shadow-xl shadow-orange-100 disabled:opacity-50 active:scale-[0.98] transition-all"
           >
-            <CheckCircle2 className="w-6 h-6 mr-3 stroke-[3]" />
+            <CheckCircle2 className="w-8 h-8 mr-4 stroke-[3]" />
             PAY PARTIAL BILL
           </Button>
         </div>
