@@ -86,7 +86,6 @@ function DesktopProductGrid({ onAddToCart, selectedCategory }: { onAddToCart: (p
           >
             <div className="flex flex-col gap-[0.5vh]">
               <span className="font-black text-zinc-900 text-[1.4vh] leading-tight px-[1vh]">{product.name}</span>
-              <span className="text-zinc-500 font-black text-[1.6vh]">Qty: {product.stock}</span>
             </div>
           </button>
         ))}
@@ -157,7 +156,7 @@ function DesktopOrderPanel({ cart, discounts, onRemoveSelected, selectedItemId, 
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-[2vh] flex flex-col gap-[1vh] custom-scrollbar">
+      <div className="flex-1 overflow-y-auto flex flex-col custom-scrollbar">
         {cart.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-zinc-400 gap-[2vh]">
             <ShoppingCart className="w-[6vh] h-[6vh] opacity-20" />
@@ -168,12 +167,10 @@ function DesktopOrderPanel({ cart, discounts, onRemoveSelected, selectedItemId, 
             <button 
               key={item.cartItemId} 
               onClick={() => onSelect(item.cartItemId)}
-              className={`bg-white border rounded-[2vh] p-[1.5vh] flex flex-col gap-[1.5vh] shadow-sm transition-all ${selectedItemId === item.cartItemId ? 'border-orange-500 ring-2 ring-orange-200' : 'border-zinc-200'}`}
+              className={`w-full p-[1vh] border-b border-zinc-200 text-left transition-all flex justify-between items-center ${selectedItemId === item.cartItemId ? 'bg-orange-100' : 'bg-white'}`}
             >
-              <div className="flex justify-between items-start gap-[1vh]">
-                <span className="font-black text-zinc-900 text-[1.6vh] leading-tight">{item.name}</span>
-                <span className="font-black text-zinc-500 text-[1.6vh]">Qty: {item.quantity}</span>
-              </div>
+              <span className="font-black text-zinc-900 text-[1.6vh] leading-none">{item.name}</span>
+              <span className="font-black text-zinc-500 text-[1.6vh] leading-none">x{item.quantity}</span>
             </button>
           ))
         )}
@@ -311,8 +308,15 @@ export default function App() {
     );
   };
 
-  const handleRemoveFromCart = (cartItemId: string) => {
-    setCart((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
+  const handleRemoveFromCart = (cartItemId: string, removeAll: boolean = false) => {
+    if (removeAll) {
+      const itemToRemove = cart.find(i => i.cartItemId === cartItemId);
+      if (itemToRemove) {
+        setCart(prev => prev.filter(item => item.id !== itemToRemove.id));
+      }
+    } else {
+      setCart(prev => prev.filter(item => item.cartItemId !== cartItemId));
+    }
   };
 
   const handleClearCart = () => {
@@ -1106,8 +1110,23 @@ export default function App() {
                 discounts={discounts}
                 onRemoveSelected={() => {
                   if (selectedItemId) {
-                    handleRemoveFromCart(selectedItemId);
-                    setSelectedItemId(null);
+                    setCart(prev => {
+                      const index = prev.findIndex(i => i.cartItemId === selectedItemId);
+                      if (index === -1) return prev;
+                      
+                      // Remove only the specific item
+                      const remainingItems = [...prev.slice(0, index), ...prev.slice(index + 1)];
+                      
+                      if (remainingItems.length > 0) {
+                        // Select the next item, or the last one if we deleted the last item
+                        const nextIndex = Math.min(index, remainingItems.length - 1);
+                        setSelectedItemId(remainingItems[nextIndex].cartItemId);
+                      } else {
+                        setSelectedItemId(null);
+                      }
+                      
+                      return remainingItems;
+                    });
                   }
                 }}
                 selectedItemId={selectedItemId}
