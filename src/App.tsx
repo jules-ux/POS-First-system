@@ -439,13 +439,13 @@ function NavBlock({ label, active = false, onClick }: { label: string, active?: 
   return (
     <button 
       onClick={onClick}
-      className={`w-full h-32 flex items-center justify-center text-xs font-bold tracking-[0.2em] transition-none border-b border-zinc-100 ${
+      className={`w-full h-32 flex items-center justify-center text-sm font-black tracking-[0.2em] transition-none border-b border-zinc-100 ${
         active 
-          ? "bg-zinc-100 text-zinc-900" 
+          ? "bg-zinc-900 text-white" 
           : "bg-white text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
       }`}
     >
-      {label}
+      {label.toUpperCase()}
     </button>
   );
 }
@@ -454,9 +454,9 @@ function ActionBlock({ icon: Icon, label, onClick }: { icon: any, label: string,
   return (
     <button 
       onClick={onClick}
-      className="w-full h-32 flex flex-col items-center justify-center gap-2 text-[10px] font-bold tracking-widest transition-none border-b border-zinc-100 bg-white text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
+      className="w-full h-32 flex flex-col items-center justify-center gap-3 text-xs font-black tracking-widest transition-none border-b border-zinc-100 bg-white text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
     >
-      <Icon className="w-6 h-6" />
+      <Icon className="w-8 h-8 stroke-[2.5]" />
       {label}
     </button>
   );
@@ -466,15 +466,15 @@ function QuickShortcut({ label, icon: Icon, active = false, accent = false, onCl
   return (
     <button 
       onClick={onClick}
-      className={`h-full w-full border rounded-2xl flex flex-col items-center justify-center gap-2 transition-none group ${
+      className={`h-full w-full border rounded-3xl flex flex-col items-center justify-center gap-3 transition-none group ${
       active 
-        ? "bg-zinc-900 border-zinc-950 text-white shadow-lg shadow-zinc-200" 
+        ? "bg-zinc-900 border-zinc-950 text-white shadow-xl shadow-zinc-200" 
         : accent
           ? "bg-zinc-50 border-zinc-100 text-zinc-600 hover:border-zinc-300"
           : "bg-white border-zinc-200 text-zinc-400 hover:border-zinc-400 hover:text-zinc-900"
     }`}>
-      {Icon && <Icon className={`w-8 h-8 ${active ? "text-white" : accent ? "text-zinc-500" : "text-zinc-300 group-hover:text-zinc-500"}`} />}
-      <span className={`text-[10px] font-black tracking-widest ${active ? "text-white" : accent ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-900"}`}>{label}</span>
+      {Icon && <Icon className={`w-10 h-10 stroke-[2.5] ${active ? "text-white" : accent ? "text-zinc-500" : "text-zinc-300 group-hover:text-zinc-500"}`} />}
+      <span className={`text-xs font-black tracking-widest uppercase ${active ? "text-white" : accent ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-900"}`}>{label}</span>
     </button>
   );
 }

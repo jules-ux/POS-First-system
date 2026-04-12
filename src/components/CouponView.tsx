@@ -34,9 +34,9 @@ export function CouponView({ pendingValue, onApplyDiscount, onCancel }: CouponVi
       {/* Left Column: Coupon Input & Custom Discount */}
       <div className="flex-1 flex flex-col border-r border-zinc-200 bg-white">
         <div className="p-6 border-b border-zinc-100 flex justify-between items-center">
-          <h3 className="text-sm font-black text-zinc-400 uppercase tracking-widest">Coupon & Custom</h3>
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-zinc-400 hover:text-red-500 font-bold uppercase tracking-widest text-xs">
-            <XCircle className="w-5 h-5 mr-2" />
+          <h3 className="text-base font-black text-zinc-400 uppercase tracking-widest">Coupon & Custom</h3>
+          <Button variant="ghost" size="sm" onClick={onCancel} className="text-zinc-400 hover:text-red-500 font-black uppercase tracking-widest text-sm">
+            <XCircle className="w-6 h-6 mr-2 stroke-[2.5]" />
             Close
           </Button>
         </div>
@@ -45,19 +45,19 @@ export function CouponView({ pendingValue, onApplyDiscount, onCancel }: CouponVi
           <div className="p-8 space-y-10">
             {/* Coupon Code Input */}
             <div className="space-y-4">
-              <label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Enter Coupon Code</label>
-              <div className="flex gap-3">
-                <div className="flex-1 bg-zinc-50 rounded-2xl border border-zinc-100 p-4 flex items-center gap-4 focus-within:border-zinc-900 transition-all">
-                  <Tag className="w-6 h-6 text-zinc-300" />
+              <label className="text-sm font-black text-zinc-400 uppercase tracking-widest">Enter Coupon Code</label>
+              <div className="flex gap-4">
+                <div className="flex-1 bg-zinc-50 rounded-2xl border border-zinc-100 p-5 flex items-center gap-5 focus-within:border-zinc-900 transition-all">
+                  <Tag className="w-8 h-8 text-zinc-300 stroke-[2.5]" />
                   <input 
                     type="text" 
                     placeholder="E.G. SUMMER24"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    className="bg-transparent border-none outline-none w-full font-black text-xl placeholder:text-zinc-200"
+                    className="bg-transparent border-none outline-none w-full font-black text-2xl placeholder:text-zinc-200"
                   />
                 </div>
-                <Button className="h-16 px-8 bg-zinc-900 text-white font-black rounded-2xl">APPLY</Button>
+                <Button className="h-20 px-10 bg-zinc-900 text-white font-black rounded-2xl text-lg">APPLY</Button>
               </div>
             </div>
 
@@ -65,30 +65,30 @@ export function CouponView({ pendingValue, onApplyDiscount, onCancel }: CouponVi
 
             {/* Custom Discount */}
             <div className="space-y-6">
-              <label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Custom Discount</label>
+              <label className="text-sm font-black text-zinc-400 uppercase tracking-widest">Custom Discount</label>
               
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <Button 
                   variant="outline"
                   onClick={() => setDiscountType('percentage')}
-                  className={`h-20 rounded-2xl border-2 font-black text-lg gap-3 transition-all ${discountType === 'percentage' ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-100 text-zinc-400'}`}
+                  className={`h-24 rounded-2xl border-2 font-black text-xl gap-4 transition-all ${discountType === 'percentage' ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-100 text-zinc-400'}`}
                 >
-                  <Percent className="w-6 h-6" />
+                  <Percent className="w-8 h-8 stroke-[3]" />
                   PERCENTAGE
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={() => setDiscountType('fixed')}
-                  className={`h-20 rounded-2xl border-2 font-black text-lg gap-3 transition-all ${discountType === 'fixed' ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-100 text-zinc-400'}`}
+                  className={`h-24 rounded-2xl border-2 font-black text-xl gap-4 transition-all ${discountType === 'fixed' ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-100 text-zinc-400'}`}
                 >
-                  <DollarSign className="w-6 h-6" />
+                  <DollarSign className="w-8 h-8 stroke-[3]" />
                   FIXED PRICE
                 </Button>
               </div>
 
-              <div className="bg-zinc-50 rounded-[2rem] p-6 flex items-center gap-6">
-                <div className="flex-1 text-center bg-white rounded-xl py-4 border border-zinc-100">
-                  <span className="text-5xl font-black text-zinc-900 tabular-nums">
+              <div className="bg-zinc-50 rounded-[2rem] p-8 flex items-center gap-8">
+                <div className="flex-1 text-center bg-white rounded-2xl py-6 border border-zinc-100 shadow-sm">
+                  <span className="text-7xl font-black text-zinc-900 tabular-nums">
                     {discountType === 'fixed' && "$"}
                     {pendingValue || "0"}
                     {discountType === 'percentage' && "%"}
@@ -96,7 +96,7 @@ export function CouponView({ pendingValue, onApplyDiscount, onCancel }: CouponVi
                 </div>
 
                 <Button
-                  className="h-20 px-10 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black text-lg shadow-lg active:scale-[0.98] transition-all shrink-0"
+                  className="h-24 px-12 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black text-2xl shadow-xl active:scale-[0.98] transition-all shrink-0"
                   onClick={handleApplyCustom}
                 >
                   APPLY
@@ -110,22 +110,22 @@ export function CouponView({ pendingValue, onApplyDiscount, onCancel }: CouponVi
       {/* Right Column: Active Promotions */}
       <div className="flex-1 flex flex-col bg-zinc-50/50 min-w-0">
         <div className="p-6 border-b border-zinc-200 bg-white">
-          <h3 className="text-sm font-black text-zinc-400 uppercase tracking-widest">Active Promotions</h3>
+          <h3 className="text-base font-black text-zinc-400 uppercase tracking-widest">Active Promotions</h3>
         </div>
         <ScrollArea className="flex-1 min-h-0" viewportClassName="snap-y snap-mandatory">
-          <div className="p-6 space-y-3">
+          <div className="p-6 space-y-4">
             {ACTIVE_PROMOS.map((promo) => (
               <button
                 key={promo.id}
                 onClick={() => onApplyDiscount(promo.type as any, promo.value, promo.label)}
-                className="w-full p-6 rounded-3xl border-2 border-zinc-100 bg-white hover:border-zinc-900 flex justify-between items-center group transition-all text-left snap-start"
+                className="w-full p-8 rounded-[2rem] border-2 border-zinc-100 bg-white hover:border-zinc-900 flex justify-between items-center group transition-all text-left snap-start shadow-sm"
               >
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2">
                   <span className="text-xs font-black text-zinc-400 uppercase tracking-widest">Promotion</span>
-                  <span className="text-xl font-black text-zinc-900 tracking-tight">{promo.label}</span>
+                  <span className="text-2xl font-black text-zinc-900 tracking-tight">{promo.label}</span>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center group-hover:bg-zinc-900 transition-colors">
-                  <Plus className="w-6 h-6 text-zinc-300 group-hover:text-white" />
+                <div className="w-16 h-16 rounded-2xl bg-zinc-50 flex items-center justify-center group-hover:bg-zinc-900 transition-colors">
+                  <Plus className="w-8 h-8 text-zinc-300 group-hover:text-white stroke-[3]" />
                 </div>
               </button>
             ))}

@@ -60,17 +60,17 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
     <div className="w-full lg:w-[480px] h-full max-h-full bg-white border-l border-zinc-200 flex flex-col overflow-hidden relative">
       <div className="p-8 border-b border-zinc-200 flex items-center justify-between bg-white z-10 shrink-0">
         <div>
-          <h2 className="text-2xl font-black text-zinc-900 tracking-tight">Current Order</h2>
-          <p className="text-sm text-zinc-400 font-medium">Order #8429 • Today</p>
+          <h2 className="text-3xl font-black text-zinc-900 tracking-tight">Current Order</h2>
+          <p className="text-base text-zinc-400 font-bold">Order #8429 • Today</p>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => moveSelection('up')} className="w-14 h-14 text-zinc-400 hover:text-zinc-900">
-            <ChevronUp className="w-10 h-10" />
+          <Button variant="ghost" size="icon" onClick={() => moveSelection('up')} className="w-16 h-16 text-zinc-400 hover:text-zinc-900">
+            <ChevronUp className="w-12 h-12 stroke-[3]" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => moveSelection('down')} className="w-14 h-14 text-zinc-400 hover:text-zinc-900">
-            <ChevronDown className="w-10 h-10" />
+          <Button variant="ghost" size="icon" onClick={() => moveSelection('down')} className="w-16 h-16 text-zinc-400 hover:text-zinc-900">
+            <ChevronDown className="w-12 h-12 stroke-[3]" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={onClear} className="text-zinc-400 hover:text-red-500 ml-4 font-bold uppercase tracking-widest text-xs">
+          <Button variant="ghost" size="sm" onClick={onClear} className="text-zinc-400 hover:text-red-500 ml-4 font-black uppercase tracking-widest text-sm">
             Clear
           </Button>
         </div>
@@ -108,17 +108,17 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
                   }`}
                 >
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <span className="text-[10px] font-black text-zinc-300 shrink-0 tabular-nums">
+                    <div className="flex items-center gap-6 flex-1 min-w-0">
+                      <span className="text-xs font-black text-zinc-300 shrink-0 tabular-nums">
                         {String(index + 1).padStart(2, '0')}
                       </span>
-                      <h4 className="text-xl font-black tracking-tight truncate text-zinc-900">
+                      <h4 className="text-2xl font-black tracking-tight truncate text-zinc-900">
                         {item.name.toUpperCase()}
                       </h4>
                     </div>
                     
                     <div className="flex items-center shrink-0">
-                      <span className="text-2xl font-black tabular-nums text-zinc-900">
+                      <span className="text-3xl font-black tabular-nums text-zinc-900">
                         {item.quantity}
                       </span>
                     </div>
@@ -133,14 +133,14 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
       {/* Fixed Footer */}
       <div className="p-8 bg-white border-t border-zinc-200 flex flex-col gap-6 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] shrink-0">
         {discounts.length > 0 && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             {discounts.map((d, i) => (
               <div key={i} className="flex justify-between items-center text-orange-600">
-                <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                  <Tag className="w-3 h-3" />
+                <span className="text-xs font-black uppercase tracking-widest flex items-center gap-3">
+                  <Tag className="w-4 h-4 stroke-[3]" />
                   {d.label}
                 </span>
-                <span className="text-sm font-black tabular-nums">
+                <span className="text-lg font-black tabular-nums">
                   -{d.type === 'percentage' ? `${d.value}%` : `$${d.value.toFixed(2)}`}
                 </span>
               </div>
@@ -157,11 +157,11 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
 
         <div className="flex justify-between items-end">
           <div className="flex flex-col">
-            <span className="text-sm font-black text-zinc-400 uppercase tracking-widest mb-1">Total</span>
-            <div className="flex items-center gap-3">
-              <span className="text-5xl font-black text-orange-500 tabular-nums tracking-tighter">${total.toFixed(2)}</span>
-              <span className="text-2xl font-black text-zinc-200">—</span>
-              <span className="text-2xl font-black text-zinc-400 tabular-nums">{itemCount} ITEMS</span>
+            <span className="text-base font-black text-zinc-400 uppercase tracking-widest mb-2">Total</span>
+            <div className="flex items-center gap-4">
+              <span className="text-6xl font-black text-orange-500 tabular-nums tracking-tighter">${total.toFixed(2)}</span>
+              <span className="text-3xl font-black text-zinc-200">—</span>
+              <span className="text-3xl font-black text-zinc-400 tabular-nums">{itemCount} ITEMS</span>
             </div>
           </div>
         </div>
