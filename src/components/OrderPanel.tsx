@@ -14,10 +14,20 @@ interface OrderPanelProps {
   onRemove: (cartItemId: string) => void;
   onClear: () => void;
   onCheckout: () => void;
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
 }
 
-export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClear, onCheckout }: OrderPanelProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+export function OrderPanel({ 
+  cart, 
+  discounts, 
+  onUpdateQuantity, 
+  onRemove, 
+  onClear, 
+  onCheckout,
+  selectedId,
+  onSelect
+}: OrderPanelProps) {
   const [longPressProgress, setLongPressProgress] = useState(0);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -51,13 +61,13 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
   const moveSelection = (direction: 'up' | 'down') => {
     if (cart.length === 0) return;
     if (selectedId === null) {
-      setSelectedId(cart[0].cartItemId);
+      onSelect(cart[0].cartItemId);
       return;
     }
     const newIndex = direction === 'up' 
       ? Math.max(0, selectedIndex - 1) 
       : Math.min(cart.length - 1, selectedIndex + 1);
-    setSelectedId(cart[newIndex].cartItemId);
+    onSelect(cart[newIndex].cartItemId);
   };
 
   const isLongPress = useRef(false);
@@ -90,7 +100,7 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
   const handleTrashClick = () => {
     if (!isLongPress.current && selectedId) {
       onRemove(selectedId);
-      setSelectedId(null);
+      onSelect(null);
     }
   };
 
@@ -160,23 +170,34 @@ export function OrderPanel({ cart, discounts, onUpdateQuantity, onRemove, onClea
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0 }}
-                  onPointerEnter={() => setSelectedId(item.cartItemId)}
-                  onClick={() => setSelectedId(item.cartItemId)}
+                  onPointerEnter={() => onSelect(item.cartItemId)}
+                  onClick={() => onSelect(item.cartItemId)}
                   className={`w-full px-8 py-4 cursor-pointer transition-none relative group border-b border-zinc-50 snap-start snap-always ${
                     selectedId === item.cartItemId ? "bg-zinc-100" : "hover:bg-zinc-50"
                   }`}
                 >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <span className="text-[8px] font-black text-zinc-300 shrink-0 tabular-nums">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <span className="text-[8px] font-black text-zinc-300 shrink-0 tabular-nums mt-1">
                         {String(index + 1).padStart(2, '0')}
                       </span>
-                      <h4 className="text-[12px] font-black tracking-tight truncate text-zinc-900">
-                        {item.name.toUpperCase()}
-                      </h4>
+                      <div className="flex flex-col gap-1">
+                        <h4 className="text-[12px] font-black tracking-tight truncate text-zinc-900">
+                          {item.name.toUpperCase()}
+                        </h4>
+                        {item.modifications && item.modifications.length > 0 && (
+                          <div className="flex flex-col gap-0.5 ml-2 border-l-2 border-orange-200 pl-2">
+                            {item.modifications.map((mod, i) => (
+                              <span key={i} className="text-[9px] font-bold text-orange-500 uppercase tracking-widest">
+                                {mod}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
-                    <div className="flex items-center shrink-0">
+                    <div className="flex items-center shrink-0 mt-1">
                       <span className="text-[14px] font-black tabular-nums text-zinc-900">
                         {item.quantity}
                       </span>

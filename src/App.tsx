@@ -12,13 +12,14 @@ import { StoreLogin } from "./components/StoreLogin";
 import { StaffLogin } from "./components/StaffLogin";
 import { SplitView } from "./components/SplitView";
 import { CouponView } from "./components/CouponView";
+import { EditItemView } from "./components/EditItemView";
 import { Product, CartItem, Staff, PRODUCTS, CATEGORIES, Shift, StaffRole } from "@/src/types";
 import { AnimatePresence, motion } from "motion/react";
 import { Printer, DoorOpen, LogOut, Delete, CreditCard, Utensils, Copy, Badge, Edit3, MessageSquare, BookOpen, UserCheck, Plus, Trash2, Wallet, Users, Bell, Send, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type AppStep = "store-login" | "staff-login" | "pos";
-type POSMode = "NONE" | "SPLIT" | "COUPON" | "TABLES";
+type POSMode = "NONE" | "SPLIT" | "COUPON" | "TABLES" | "EDIT";
 
 const randomId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -59,15 +60,15 @@ function DesktopQuickShortcut({ label, icon: Icon, accent, orange, active, onCli
     <button 
       onClick={onClick}
       className={`
-        w-[10vh] h-[10vh] flex flex-col items-center justify-center gap-[1vh] border-r border-b border-zinc-200 transition-all shrink-0
+        w-[10vh] h-[10vh] flex flex-col items-center justify-center gap-[0.5vh] border-r border-b border-zinc-200 transition-all shrink-0
         ${active ? 'border-zinc-900 bg-zinc-900 text-white' : 
           orange ? 'border-orange-500 bg-orange-500 text-white hover:bg-orange-600' :
           accent ? 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200' : 
           'bg-white text-zinc-600 hover:bg-zinc-50'}
       `}
     >
-      <Icon className={`w-[3vh] h-[3vh] ${active || orange ? 'text-white' : accent ? 'text-zinc-900' : 'text-zinc-400'}`} />
-      <span className="text-[1vh] font-black uppercase tracking-widest">{label}</span>
+      <Icon className={`w-[2.5vh] h-[2.5vh] ${active || orange ? 'text-white' : accent ? 'text-zinc-900' : 'text-zinc-400'}`} />
+      <span className="text-[0.9vh] font-black uppercase tracking-widest">{label}</span>
     </button>
   );
 }
@@ -76,16 +77,16 @@ function DesktopProductGrid({ onAddToCart, selectedCategory }: { onAddToCart: (p
   const filteredProducts = PRODUCTS.filter(p => p.category === selectedCategory);
   
   return (
-    <div className="flex-1 overflow-y-auto bg-zinc-50 custom-scrollbar p-[2vh]">
-      <div className="flex flex-wrap gap-[2vh] pb-[10vh]">
+    <div className="flex-1 overflow-y-auto bg-zinc-50 custom-scrollbar p-[1vh]">
+      <div className="flex flex-wrap gap-[1vh] pb-[10vh]">
         {filteredProducts.map((product) => (
           <button 
             key={product.id}
             onClick={() => onAddToCart(product)}
-            className="w-[10vh] h-[10vh] bg-white rounded-[2vh] border border-zinc-200 flex flex-col items-center justify-center text-center gap-[1vh] transition-all active:scale-95 group shrink-0"
+            className="w-[10vh] h-[10vh] bg-white rounded-none border border-zinc-200 flex flex-col items-center justify-center text-center gap-[0.5vh] transition-all active:scale-95 group shrink-0"
           >
-            <div className="flex flex-col gap-[0.5vh]">
-              <span className="font-black text-zinc-900 text-[1.4vh] leading-tight px-[1vh]">{product.name}</span>
+            <div className="flex flex-col gap-[0.2vh]">
+              <span className="font-black text-zinc-900 text-[1.2vh] leading-tight px-[0.5vh] uppercase">{product.name}</span>
             </div>
           </button>
         ))}
@@ -167,9 +168,21 @@ function DesktopOrderPanel({ cart, discounts, onRemoveSelected, selectedItemId, 
             <button 
               key={item.cartItemId} 
               onMouseEnter={() => onSelect(item.cartItemId)}
-              className={`w-full p-[1vh] border-b border-zinc-200 text-left transition-all flex justify-between items-center ${selectedItemId === item.cartItemId ? 'bg-orange-100' : 'bg-white'}`}
+              onClick={() => onSelect(item.cartItemId)}
+              className={`w-full p-[1.5vh] border-b border-zinc-200 text-left transition-all flex justify-between items-start ${selectedItemId === item.cartItemId ? 'bg-orange-100' : 'bg-white'}`}
             >
-              <span className="font-black text-zinc-900 text-[1.6vh] leading-none">{item.name}</span>
+              <div className="flex flex-col gap-[0.5vh]">
+                <span className="font-black text-zinc-900 text-[1.6vh] leading-none">{item.name.toUpperCase()}</span>
+                {item.modifications && item.modifications.length > 0 && (
+                  <div className="flex flex-col gap-[0.2vh] ml-[1vh] border-l-2 border-orange-300 pl-[1vh]">
+                    {item.modifications.map((mod: string, i: number) => (
+                      <span key={i} className="text-[1vh] font-bold text-orange-600 uppercase tracking-widest leading-none">
+                        {mod}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
               <span className="font-black text-zinc-500 text-[1.6vh] leading-none">x{item.quantity}</span>
             </button>
           ))
@@ -299,15 +312,24 @@ export default function App() {
   const handleAddToCart = (product: Product) => {
     const qty = parseInt(pendingQty) || 1;
     const finalQty = isNegative ? -qty : qty;
+    const newItemId = randomId();
 
     setCart((prev) => [
       ...prev,
-      { ...product, cartItemId: randomId(), quantity: finalQty }
+      { ...product, cartItemId: newItemId, quantity: finalQty }
     ]);
+
+    setSelectedItemId(newItemId);
 
     // Reset quantity selection
     setPendingQty("");
     setIsNegative(false);
+  };
+
+  const handleSaveModifications = (cartItemId: string, mods: string[]) => {
+    setCart(prev => prev.map(item => 
+      item.cartItemId === cartItemId ? { ...item, modifications: mods } : item
+    ));
   };
 
   const handleUpdateQuantity = (cartItemId: string, delta: number) => {
@@ -476,20 +498,20 @@ export default function App() {
                     </div>
 
                     {/* Product Grid */}
-                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                      <div className="grid grid-cols-2 gap-3 pb-20">
+                    <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
+                      <div className="grid grid-cols-2 gap-1.5 pb-20">
                         {PRODUCTS.filter(p => p.category === selectedCategory).map(product => (
                           <button
                             key={product.id}
                             onClick={() => handleAddToCart(product)}
-                            className="bg-white p-4 rounded-2xl border border-zinc-200 flex flex-col gap-3 text-left active:scale-95 transition-transform shadow-sm"
+                            className="bg-white p-2 rounded-none border border-zinc-200 flex flex-col gap-1.5 text-left active:scale-95 transition-transform shadow-sm"
                           >
-                            <div className="w-10 h-10 rounded-full bg-zinc-50 flex items-center justify-center mb-1">
-                              <Plus className="w-5 h-5 text-zinc-400" />
+                            <div className="w-8 h-8 rounded-none bg-zinc-50 flex items-center justify-center mb-0.5">
+                              <Plus className="w-4 h-4 text-zinc-400" />
                             </div>
                             <div className="flex flex-col">
-                              <span className="font-black text-zinc-900 leading-tight mb-1">{product.name}</span>
-                              <span className="text-orange-500 font-black">${product.price.toFixed(2)}</span>
+                              <span className="font-black text-zinc-900 text-xs leading-tight mb-0.5 uppercase">{product.name}</span>
+                              <span className="text-orange-500 font-black text-xs">${product.price.toFixed(2)}</span>
                             </div>
                           </button>
                         ))}
@@ -559,6 +581,12 @@ export default function App() {
                       ))}
                     </div>
                   </div>
+                ) : activeMode === "EDIT" ? (
+                  <EditItemView
+                    item={cart.find(i => i.cartItemId === selectedItemId)!}
+                    onSave={handleSaveModifications}
+                    onClose={() => setActiveMode("NONE")}
+                  />
                 ) : (
                   <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                     <div className="bg-white rounded-3xl p-5 shadow-sm border border-zinc-200 mb-6 space-y-4">
@@ -639,19 +667,30 @@ export default function App() {
                         </div>
                       ) : (
                         cart.map(item => (
-                          <div key={item.cartItemId} className="flex justify-between items-center p-4 bg-white rounded-2xl border border-zinc-200 shadow-sm">
-                            <div className="flex flex-col">
-                              <span className="font-black text-zinc-900 text-lg leading-tight">{item.name}</span>
-                              <span className="text-orange-500 font-black">${item.price.toFixed(2)}</span>
-                            </div>
-                            <div className="flex items-center gap-4 bg-zinc-50 p-1 rounded-xl border border-zinc-200">
-                              <button className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-zinc-600 active:scale-95" onClick={() => handleUpdateQuantity(item.cartItemId, -1)}>
-                                <Minus className="w-4 h-4 stroke-[3]" />
-                              </button>
-                              <span className="font-black text-lg w-6 text-center tabular-nums">{item.quantity}</span>
-                              <button className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-zinc-600 active:scale-95" onClick={() => handleUpdateQuantity(item.cartItemId, 1)}>
-                                <Plus className="w-4 h-4 stroke-[3]" />
-                              </button>
+                          <div key={item.cartItemId} className="flex flex-col p-4 bg-white rounded-2xl border border-zinc-200 shadow-sm gap-3">
+                            <div className="flex justify-between items-start">
+                              <div className="flex flex-col gap-1">
+                                <span className="font-black text-zinc-900 text-lg leading-tight uppercase">{item.name}</span>
+                                {item.modifications && item.modifications.length > 0 && (
+                                  <div className="flex flex-col gap-0.5 ml-2 border-l-2 border-orange-200 pl-2">
+                                    {item.modifications.map((mod, i) => (
+                                      <span key={i} className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">
+                                        {mod}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                                <span className="text-orange-500 font-black">${item.price.toFixed(2)}</span>
+                              </div>
+                              <div className="flex items-center gap-4 bg-zinc-50 p-1 rounded-xl border border-zinc-200">
+                                <button className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-zinc-600 active:scale-95" onClick={() => handleUpdateQuantity(item.cartItemId, -1)}>
+                                  <Minus className="w-4 h-4 stroke-[3]" />
+                                </button>
+                                <span className="font-black text-lg w-6 text-center tabular-nums">{item.quantity}</span>
+                                <button className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-zinc-600 active:scale-95" onClick={() => handleUpdateQuantity(item.cartItemId, 1)}>
+                                  <Plus className="w-4 h-4 stroke-[3]" />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         ))
@@ -821,6 +860,12 @@ export default function App() {
                               setPendingMode("NONE");
                             }}
                           />
+                        ) : activeMode === "EDIT" ? (
+                          <EditItemView
+                            item={cart.find(i => i.cartItemId === selectedItemId)!}
+                            onSave={handleSaveModifications}
+                            onClose={() => setActiveMode("NONE")}
+                          />
                         ) : activeMode === "TABLES" ? (
                           <div className="flex-1 flex items-center justify-center bg-zinc-50">
                             <div className="text-center space-y-4">
@@ -849,7 +894,7 @@ export default function App() {
 
                   {/* Bottom Area: Shortcuts and Number Pad (Always Visible) */}
                   <div className="h-[640px] border-t border-zinc-200 bg-white flex shrink-0">
-                    <div className="flex-1 p-6 grid grid-cols-4 grid-rows-4 gap-3">
+                    <div className="flex-1 p-3 grid grid-cols-4 grid-rows-4 gap-1.5">
                       <QuickShortcut 
                         label="QUICK SALE" 
                         icon={CreditCard} 
@@ -875,7 +920,13 @@ export default function App() {
                         onClick={() => requestMode("COUPON")}
                       />
                       
-                      <QuickShortcut label="EDIT" icon={Edit3} accent />
+                      <QuickShortcut 
+                        label="EDIT" 
+                        icon={Edit3} 
+                        accent 
+                        active={activeMode === "EDIT"}
+                        onClick={() => selectedItemId && requestMode("EDIT")}
+                      />
                       <QuickShortcut label="REPEAT" icon={Copy} accent />
                       <QuickShortcut label="NOTES" icon={MessageSquare} accent />
                       <QuickShortcut label="RECIPES" icon={BookOpen} accent />
@@ -913,6 +964,8 @@ export default function App() {
                 onRemove={handleRemoveFromCart}
                 onClear={handleClearCart}
                 onCheckout={handleCompleteCheckout}
+                selectedId={selectedItemId}
+                onSelect={setSelectedItemId}
               />
             </div>
             </div>
@@ -1054,6 +1107,12 @@ export default function App() {
                               setPendingMode("NONE");
                             }}
                           />
+                        ) : activeMode === "EDIT" ? (
+                          <EditItemView
+                            item={cart.find(i => i.cartItemId === selectedItemId)!}
+                            onSave={handleSaveModifications}
+                            onClose={() => setActiveMode("NONE")}
+                          />
                         ) : activeMode === "TABLES" ? (
                           <div className="flex-1 flex items-center justify-center bg-zinc-50">
                             <div className="text-center space-y-4">
@@ -1088,7 +1147,13 @@ export default function App() {
                         <DesktopQuickShortcut label="SPLIT" icon={Copy} active={activeMode === "SPLIT"} onClick={() => requestMode("SPLIT")} />
                         <DesktopQuickShortcut label="COUPON" icon={Badge} active={activeMode === "COUPON"} onClick={() => requestMode("COUPON")} />
                         
-                        <DesktopQuickShortcut label="EDIT" icon={Edit3} accent />
+                        <DesktopQuickShortcut 
+                          label="EDIT" 
+                          icon={Edit3} 
+                          accent 
+                          active={activeMode === "EDIT"}
+                          onClick={() => selectedItemId && requestMode("EDIT")}
+                        />
                         <DesktopQuickShortcut label="REPEAT" icon={Copy} accent />
                         <DesktopQuickShortcut label="NOTES" icon={MessageSquare} accent />
                         <DesktopQuickShortcut label="RECIPES" icon={BookOpen} accent />
@@ -1315,7 +1380,7 @@ function QuickShortcut({ label, icon: Icon, active = false, accent = false, oran
   return (
     <button 
       onClick={onClick}
-      className={`h-full w-full border rounded-[2rem] flex flex-col items-center justify-center gap-4 transition-none group ${
+      className={`h-full w-full border rounded-none flex flex-col items-center justify-center gap-2 transition-none group ${
       active && !orange
         ? "bg-zinc-900 border-zinc-950 text-white shadow-xl shadow-zinc-200" 
         : orange
@@ -1324,8 +1389,8 @@ function QuickShortcut({ label, icon: Icon, active = false, accent = false, oran
             ? "bg-zinc-50 border-zinc-100 text-zinc-600 hover:border-zinc-300"
             : "bg-white border-zinc-200 text-zinc-400 hover:border-zinc-400 hover:text-zinc-900"
     }`}>
-      {Icon && <Icon className={`w-12 h-12 stroke-[2.5] ${active && !orange ? "text-white" : orange ? "text-orange-500" : accent ? "text-zinc-500" : "text-zinc-300 group-hover:text-zinc-500"}`} />}
-      <span className={`text-sm font-black tracking-widest uppercase ${active && !orange ? "text-white" : orange ? "text-orange-600" : accent ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-900"}`}>{label}</span>
+      {Icon && <Icon className={`w-8 h-8 stroke-[2.5] ${active && !orange ? "text-white" : orange ? "text-orange-500" : accent ? "text-zinc-500" : "text-zinc-300 group-hover:text-zinc-500"}`} />}
+      <span className={`text-[10px] font-black tracking-widest uppercase ${active && !orange ? "text-white" : orange ? "text-orange-600" : accent ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-900"}`}>{label}</span>
     </button>
   );
 }
@@ -1348,12 +1413,12 @@ function NumberPad({
   };
 
   return (
-    <div className="w-[500px] border-l border-zinc-200 p-8 grid grid-cols-3 gap-4 bg-zinc-50/30">
+    <div className="w-[500px] border-l border-zinc-200 p-4 grid grid-cols-3 gap-2 bg-zinc-50/30">
       {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
         <Button 
           key={n} 
           variant="outline" 
-          className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-[2rem] shadow-sm transition-none"
+          className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-none shadow-sm transition-none"
           onClick={() => handlePress(n.toString())}
         >
           {n}
@@ -1361,28 +1426,28 @@ function NumberPad({
       ))}
       <Button 
         variant="outline" 
-        className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-[2rem] shadow-sm transition-none"
+        className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-none shadow-sm transition-none"
         onClick={() => handlePress("9")}
       >
         9
       </Button>
       <Button 
         variant="outline" 
-        className="h-full text-zinc-400 hover:text-red-500 rounded-[2rem] transition-none"
+        className="h-full text-zinc-400 hover:text-red-500 rounded-none transition-none"
         onClick={onClear}
       >
         <Delete className="w-12 h-12" />
       </Button>
       <Button 
         variant="outline" 
-        className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-[2rem] shadow-sm transition-none"
+        className="h-full text-4xl font-black bg-white border-zinc-200 hover:border-zinc-900 hover:text-zinc-900 rounded-none shadow-sm transition-none"
         onClick={() => handlePress("0")}
       >
         0
       </Button>
       <Button 
         variant="outline" 
-        className={`h-full text-5xl font-black rounded-[2rem] transition-none ${isNegative ? "bg-red-500 text-white border-red-600" : "bg-white border-zinc-200 text-zinc-400 hover:text-zinc-900"}`}
+        className={`h-full text-5xl font-black rounded-none transition-none ${isNegative ? "bg-red-500 text-white border-red-600" : "bg-white border-zinc-200 text-zinc-400 hover:text-zinc-900"}`}
         onClick={onToggleNegative}
       >
         -

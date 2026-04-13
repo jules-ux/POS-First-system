@@ -181,14 +181,14 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
                     <button
                       key={staff.id}
                       onClick={() => setSelectedStaff(staff)}
-                      className="flex flex-col items-center justify-center border-r border-b border-zinc-100 hover:bg-zinc-950 hover:border-zinc-950 group active:bg-zinc-900 overflow-hidden"
+                      className="flex flex-col items-center justify-center border-r border-b border-zinc-100 hover:bg-zinc-950 hover:border-zinc-950 group active:scale-[0.98] active:bg-zinc-900 overflow-hidden transition-all select-none w-full h-full"
                     >
-                      <span className={`font-black text-zinc-950 group-hover:text-orange-500 mb-0.5 ${
+                      <span className={`font-black text-zinc-950 group-hover:text-orange-500 mb-0.5 pointer-events-none ${
                         gridSize > 4 ? "text-lg lg:text-xl" : "text-xl lg:text-2xl"
                       }`}>
                         {staff.number}
                       </span>
-                      <span className={`font-bold text-zinc-400 uppercase tracking-widest group-hover:text-zinc-300 truncate px-2 w-full text-center ${
+                      <span className={`font-bold text-zinc-400 uppercase tracking-widest group-hover:text-zinc-300 truncate px-2 w-full text-center pointer-events-none ${
                         gridSize > 4 ? "text-[7px]" : "text-[9px]"
                       }`}>
                         {staff.name}
@@ -251,19 +251,19 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
               </div>
               
               {/* Bottom Section: Large Square Grid (2/3 height) */}
-              <div className="h-2/3 grid grid-cols-3 w-full">
+              <div className="h-2/3 grid grid-cols-3 w-full select-none">
                 {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((num) => (
                   <button
                     key={num}
                     onClick={() => handleNumberClick(num)}
-                    className="flex items-center justify-center border-r border-b border-zinc-100 text-3xl font-black text-zinc-950 hover:bg-zinc-950 hover:text-white active:bg-zinc-900"
+                    className="w-full h-full flex items-center justify-center border-r border-b border-zinc-100 text-3xl font-black text-zinc-950 hover:bg-zinc-950 hover:text-white active:bg-zinc-900 active:scale-[0.98] transition-all"
                   >
                     {num}
                   </button>
                 ))}
                 
                 {/* Bottom Row */}
-                <div className="relative border-r border-zinc-100">
+                <div className="relative border-r border-zinc-100 w-full h-full">
                   <AnimatePresence mode="wait">
                     {code.length === 0 ? (
                       <motion.button
@@ -277,10 +277,10 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
                           setIsShiftManagerActive(false);
                           setSelectingRole(false);
                         }}
-                        className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-50 hover:bg-zinc-950 group"
+                        className="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-zinc-50 hover:bg-zinc-950 group active:bg-zinc-900 active:scale-[0.98] transition-all"
                       >
-                        <ChevronLeft className="w-5 h-5 text-zinc-400 group-hover:text-orange-500 mb-1" />
-                        <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest group-hover:text-zinc-300">
+                        <ChevronLeft className="w-5 h-5 text-zinc-400 group-hover:text-orange-500 mb-1 pointer-events-none" />
+                        <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest group-hover:text-zinc-300 pointer-events-none">
                           Change Staff
                         </span>
                       </motion.button>
@@ -292,9 +292,9 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0 }}
                         onClick={handleDelete}
-                        className="absolute inset-0 flex items-center justify-center bg-zinc-50 hover:bg-red-500 hover:text-white group"
+                        className="absolute inset-0 w-full h-full flex items-center justify-center bg-zinc-50 hover:bg-red-500 hover:text-white group active:bg-red-600 active:scale-[0.98] transition-all"
                       >
-                        <Delete className="w-8 h-8 text-zinc-400 group-hover:text-white" />
+                        <Delete className="w-8 h-8 text-zinc-400 group-hover:text-white pointer-events-none" />
                       </motion.button>
                     )}
                   </AnimatePresence>
@@ -302,17 +302,17 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
                 
                 <button
                   onClick={() => handleNumberClick("0")}
-                  className="flex items-center justify-center border-r border-zinc-100 text-3xl font-black text-zinc-950 hover:bg-zinc-950 hover:text-white active:bg-zinc-900"
+                  className="w-full h-full flex items-center justify-center border-r border-zinc-100 text-3xl font-black text-zinc-950 hover:bg-zinc-950 hover:text-white active:bg-zinc-900 active:scale-[0.98] transition-all"
                 >
                   0
                 </button>
                 
                 <button
                   onClick={handleOkClick}
-                  className="flex flex-col items-center justify-center bg-zinc-50 hover:bg-orange-500 group transition-all"
+                  className="w-full h-full flex flex-col items-center justify-center bg-zinc-50 hover:bg-orange-500 group active:bg-orange-600 active:scale-[0.98] transition-all"
                 >
-                  <CheckCircle2 className="w-6 h-6 text-zinc-400 group-hover:text-white mb-1" />
-                  <span className="text-[10px] font-black text-zinc-400 group-hover:text-white uppercase tracking-widest">OK</span>
+                  <CheckCircle2 className="w-6 h-6 text-zinc-400 group-hover:text-white mb-1 pointer-events-none" />
+                  <span className="text-[10px] font-black text-zinc-400 group-hover:text-white uppercase tracking-widest pointer-events-none">OK</span>
                 </button>
               </div>
             </motion.div>
