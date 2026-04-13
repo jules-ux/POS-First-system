@@ -55,9 +55,9 @@ export function SplitView({
   const splitTotal = splitCart.reduce((acc, item) => acc + item.price * item.quantity, 0) * 1.08;
 
   return (
-    <div className="flex-1 flex bg-zinc-50 overflow-hidden relative">
+    <div className="flex-1 flex bg-zinc-50 overflow-hidden relative w-full h-full">
       {/* Left Column: Main Order */}
-      <div className="flex-1 flex flex-col border-r border-zinc-200 bg-white">
+      <div className="flex-1 flex flex-col border-r border-zinc-200 bg-white min-w-[300px]">
         <div className="p-6 border-b border-zinc-100 flex justify-between items-center shrink-0">
           <h3 className="text-sm font-black text-zinc-400 uppercase tracking-widest">Main Order</h3>
           <span className="text-xs font-bold text-zinc-400">{mainCart.length} items</span>
@@ -164,12 +164,12 @@ export function SplitView({
                 <span className="text-7xl font-black text-zinc-900 tabular-nums">{moveQty || "0"}</span>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0].map((val) => (
                   <Button
                     key={val}
                     variant="outline"
-                    className="h-20 text-2xl font-black rounded-2xl border-zinc-100 hover:border-zinc-900"
+                    className="h-14 text-xl font-black rounded-xl border-zinc-100 hover:border-zinc-900"
                     onClick={() => {
                       if (val === "C") setMoveQty("");
                       else setMoveQty(prev => prev + val);
@@ -179,7 +179,7 @@ export function SplitView({
                   </Button>
                 ))}
                 <Button
-                  className="h-20 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-xl shadow-lg shadow-orange-100 active:scale-[0.98] transition-all"
+                  className="h-14 col-span-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-lg shadow-lg shadow-orange-100 active:scale-[0.98] transition-all"
                   onClick={confirmMove}
                 >
                   OK

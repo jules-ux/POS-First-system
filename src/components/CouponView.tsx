@@ -43,44 +43,46 @@ export function CouponView({
   };
 
   return (
-    <div className="flex-1 flex bg-zinc-50 overflow-hidden relative">
+    <div className="flex-1 flex bg-zinc-50 overflow-hidden relative w-full h-full">
       {/* Left Column: Custom Discount & Applied Discounts */}
-      <div className="flex-1 flex flex-col border-r border-zinc-200 bg-white">
-        <div className="p-6 border-b border-zinc-100 flex justify-between items-center shrink-0">
-          <h3 className="text-base font-black text-zinc-400 uppercase tracking-widest">Discounts</h3>
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-zinc-400 hover:text-red-500 font-black uppercase tracking-widest text-sm">
-            <XCircle className="w-6 h-6 mr-2 stroke-[2.5]" />
+      <div className="flex-1 flex flex-col border-r border-zinc-200 bg-white min-w-[300px]">
+        {/* Header */}
+        <div className="h-[8vh] border-b border-zinc-100 flex justify-between items-center px-3 shrink-0">
+          <h3 className="text-[7.5px] font-black text-zinc-400 uppercase tracking-widest">Discounts</h3>
+          <Button variant="ghost" size="sm" onClick={onCancel} className="text-zinc-400 hover:text-red-500 font-black uppercase tracking-widest text-[7.5px]">
+            <XCircle className="w-3.5 h-3.5 mr-0.5 stroke-[2.5]" />
             Close
           </Button>
         </div>
         
+        {/* Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Custom Discount Section (Fixed) */}
-          <div className="p-6 space-y-4 shrink-0 border-b border-zinc-50">
-            <label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Custom Discount</label>
+          {/* Custom Discount Section (reduced height) */}
+          <div className="h-[20vh] p-3 space-y-2 shrink-0 border-b border-zinc-50">
+            <label className="text-[7.5px] font-black text-zinc-400 uppercase tracking-widest">Custom Discount</label>
             
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <Button 
                 variant="outline"
                 onClick={() => setDiscountType('percentage')}
-                className={`h-16 rounded-xl border-2 font-black text-sm gap-3 transition-all ${discountType === 'percentage' ? 'border-zinc-700 bg-zinc-700 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
+                className={`h-7 rounded-md border-2 font-black text-[7.5px] gap-0.5 transition-all ${discountType === 'percentage' ? 'border-zinc-700 bg-zinc-700 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
               >
-                <Percent className="w-5 h-5 stroke-[3]" />
+                <Percent className="w-2.5 h-2.5 stroke-[3]" />
                 PERCENT
               </Button>
               <Button 
                 variant="outline"
                 onClick={() => setDiscountType('fixed')}
-                className={`h-16 rounded-xl border-2 font-black text-sm gap-3 transition-all ${discountType === 'fixed' ? 'border-zinc-700 bg-zinc-700 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
+                className={`h-7 rounded-md border-2 font-black text-[7.5px] gap-0.5 transition-all ${discountType === 'fixed' ? 'border-zinc-700 bg-zinc-700 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
               >
-                <DollarSign className="w-5 h-5 stroke-[3]" />
+                <DollarSign className="w-2.5 h-2.5 stroke-[3]" />
                 FIXED
               </Button>
             </div>
 
-            <div className="bg-zinc-50 rounded-2xl p-4 flex items-center gap-4">
-              <div className="flex-1 text-center bg-white rounded-xl py-3 border border-zinc-100 shadow-sm">
-                <span className="text-3xl font-black text-zinc-900 tabular-nums">
+            <div className="bg-zinc-50 rounded-lg p-2 flex items-center gap-2">
+              <div className="flex-1 text-center bg-white rounded-md py-1 border border-zinc-100 shadow-sm">
+                <span className="text-[17.5px] font-black text-zinc-900 tabular-nums">
                   {discountType === 'fixed' && "$"}
                   {pendingValue || "0"}
                   {discountType === 'percentage' && "%"}
@@ -88,7 +90,7 @@ export function CouponView({
               </div>
 
               <Button
-                className="h-16 px-8 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black text-lg shadow-lg shadow-orange-100 active:scale-[0.98] transition-all shrink-0"
+                className="h-7 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md font-black text-[10px] shadow-lg shadow-orange-100 active:scale-[0.98] transition-all shrink-0"
                 onClick={handleApplyCustom}
               >
                 APPLY
@@ -96,28 +98,28 @@ export function CouponView({
             </div>
           </div>
 
-          {/* Applied Discounts Section (Independent Scroll) */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4 bg-zinc-50/30">
-            <label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Applied Coupons</label>
+          {/* Applied Discounts Section (almost connected) */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1 bg-zinc-50/30 pb-0">
+            <label className="text-[7.5px] font-black text-zinc-400 uppercase tracking-widest">Applied Coupons</label>
             {discounts.length === 0 ? (
-              <div className="py-10 text-center border-2 border-dashed border-zinc-100 rounded-2xl bg-white">
-                <p className="text-zinc-300 font-bold">No coupons applied</p>
+              <div className="py-1 text-center border-2 border-dashed border-zinc-100 rounded-md bg-white">
+                <p className="text-[10px] text-zinc-300 font-bold">No coupons applied</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-0.5">
                 {discounts.map((d, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 bg-orange-50 rounded-xl border border-orange-100 group shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <Tag className="w-5 h-5 text-orange-500 stroke-[2.5]" />
-                      <span className="font-black text-orange-900 uppercase tracking-tight">{d.label}</span>
+                  <div key={i} className="flex items-center justify-between p-1 bg-orange-50 rounded-md border border-orange-100 group shadow-sm">
+                    <div className="flex items-center gap-1">
+                      <Tag className="w-2.5 h-2.5 text-orange-500 stroke-[2.5]" />
+                      <span className="font-black text-[10px] text-orange-900 uppercase tracking-tight">{d.label}</span>
                     </div>
                     <Button 
                       variant="ghost" 
                       size="icon" 
                       onClick={() => onRemoveDiscount(i)}
-                      className="w-8 h-8 text-orange-300 hover:text-red-500 hover:bg-white rounded-lg transition-all"
+                      className="w-3.5 h-3.5 text-orange-300 hover:text-red-500 hover:bg-white rounded-sm transition-all"
                     >
-                      <XCircle className="w-5 h-5 stroke-[2.5]" />
+                      <XCircle className="w-2.5 h-2.5 stroke-[2.5]" />
                     </Button>
                   </div>
                 ))}
@@ -129,23 +131,27 @@ export function CouponView({
 
       {/* Right Column: Active Promotions (Compact & Full Width) */}
       <div className="flex-1 flex flex-col bg-zinc-50/50 min-w-0">
-        <div className="p-6 border-b border-zinc-200 bg-white shrink-0">
-          <h3 className="text-base font-black text-zinc-400 uppercase tracking-widest">Promotions</h3>
+        {/* Header */}
+        <div className="h-[8vh] border-b border-zinc-200 bg-white shrink-0 flex items-center px-3">
+          <h3 className="text-[7.5px] font-black text-zinc-400 uppercase tracking-widest">Promotions</h3>
         </div>
+        {/* Content */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="p-4 space-y-2">
-            {ACTIVE_PROMOS.map((promo) => (
-              <button
-                key={promo.id}
-                onClick={() => onApplyDiscount(promo.type as any, promo.value, promo.label)}
-                className="w-full p-4 rounded-xl border-2 border-zinc-100 bg-white hover:border-orange-500 flex justify-between items-center group transition-all text-left shadow-sm"
-              >
-                <span className="text-lg font-black text-zinc-900 tracking-tight uppercase">{promo.label}</span>
-                <div className="w-10 h-10 rounded-lg bg-zinc-50 flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                  <Plus className="w-5 h-5 text-zinc-300 group-hover:text-white stroke-[3]" />
-                </div>
-              </button>
-            ))}
+          <div className="p-3 space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              {ACTIVE_PROMOS.map((promo) => (
+                <button
+                  key={promo.id}
+                  onClick={() => onApplyDiscount(promo.type as any, promo.value, promo.label)}
+                  className="w-full p-2 rounded-lg border-2 border-zinc-100 bg-white hover:border-orange-500 flex flex-col justify-between items-start gap-1 group transition-all text-left shadow-sm h-20"
+                >
+                  <span className="text-[10px] font-black text-zinc-900 tracking-tight uppercase">{promo.label}</span>
+                  <div className="w-5 h-5 rounded-sm bg-zinc-50 flex items-center justify-center group-hover:bg-orange-500 transition-colors">
+                    <Plus className="w-2.5 h-2.5 text-zinc-300 group-hover:text-white stroke-[3]" />
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
