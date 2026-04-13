@@ -351,11 +351,16 @@ export default function App() {
     } else {
       setCart(prev => prev.filter(item => item.cartItemId !== cartItemId));
     }
+    if (selectedItemId === cartItemId) {
+      setSelectedItemId(null);
+    }
   };
 
   const handleClearCart = () => {
     setCart([]);
     setDiscounts([]);
+    setSelectedItemId(null);
+    setActiveMode("NONE");
   };
 
   const handleAddDiscount = (type: 'percentage' | 'fixed', value: number, label: string) => {
@@ -406,6 +411,8 @@ export default function App() {
   const handleRemoveDiscount = (index: number) => {
     setDiscounts(prev => prev.filter((_, i) => i !== index));
   };
+
+  const editingItem = cart.find(i => i.cartItemId === selectedItemId);
 
   return (
     <div className="fixed inset-0 bg-white overflow-hidden font-sans selection:bg-orange-100 selection:text-orange-900">
@@ -581,9 +588,9 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-                ) : activeMode === "EDIT" ? (
+                ) : activeMode === "EDIT" && editingItem ? (
                   <EditItemView
-                    item={cart.find(i => i.cartItemId === selectedItemId)!}
+                    item={editingItem}
                     onSave={handleSaveModifications}
                     onClose={() => setActiveMode("NONE")}
                   />
@@ -860,9 +867,9 @@ export default function App() {
                               setPendingMode("NONE");
                             }}
                           />
-                        ) : activeMode === "EDIT" ? (
+                        ) : activeMode === "EDIT" && editingItem ? (
                           <EditItemView
-                            item={cart.find(i => i.cartItemId === selectedItemId)!}
+                            item={editingItem}
                             onSave={handleSaveModifications}
                             onClose={() => setActiveMode("NONE")}
                           />
@@ -1107,9 +1114,9 @@ export default function App() {
                               setPendingMode("NONE");
                             }}
                           />
-                        ) : activeMode === "EDIT" ? (
+                        ) : activeMode === "EDIT" && editingItem ? (
                           <EditItemView
-                            item={cart.find(i => i.cartItemId === selectedItemId)!}
+                            item={editingItem}
                             onSave={handleSaveModifications}
                             onClose={() => setActiveMode("NONE")}
                           />
