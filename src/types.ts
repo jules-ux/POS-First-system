@@ -22,6 +22,18 @@ export interface Staff {
   role?: string;
 }
 
+export type ShiftStatus = 'not-working' | 'working' | 'on-break';
+export type StaffRole = 'Bediening' | 'Keuken' | 'Bar' | 'Runner';
+
+export interface Shift {
+  staffId: string;
+  status: ShiftStatus;
+  role?: StaffRole;
+  startTime?: number; // timestamp
+  breakStartTime?: number; // timestamp
+  totalBreakTime: number; // in milliseconds
+}
+
 export const STAFF_MEMBERS: Staff[] = [
   { id: "1", number: "101", name: "Alex", pin: "1234", role: "Manager" },
   { id: "2", number: "202", name: "Sarah", pin: "1111", role: "Cashier" },

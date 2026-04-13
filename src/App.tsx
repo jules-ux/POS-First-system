@@ -12,7 +12,7 @@ import { StoreLogin } from "./components/StoreLogin";
 import { StaffLogin } from "./components/StaffLogin";
 import { SplitView } from "./components/SplitView";
 import { CouponView } from "./components/CouponView";
-import { Product, CartItem, Staff, PRODUCTS, CATEGORIES } from "@/src/types";
+import { Product, CartItem, Staff, PRODUCTS, CATEGORIES, Shift, StaffRole } from "@/src/types";
 import { AnimatePresence, motion } from "motion/react";
 import { Printer, DoorOpen, LogOut, Delete, CreditCard, Utensils, Copy, Badge, Edit3, MessageSquare, BookOpen, UserCheck, Plus, Trash2, Wallet, Users, Bell, Send, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -279,6 +279,18 @@ export default function App() {
   const [mobileDiscountType, setMobileDiscountType] = useState<'percentage' | 'fixed'>('percentage');
   const [mobileDiscountValue, setMobileDiscountValue] = useState("");
 
+  const [shifts, setShifts] = useState<Record<string, Shift>>({});
+
+  const handleUpdateShift = (staffId: string, shift: Shift | null) => {
+    setShifts(prev => {
+      if (shift === null) {
+        const { [staffId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [staffId]: shift };
+    });
+  };
+
   const handleStaffLogin = (staff: Staff) => {
     setCurrentStaff(staff);
     setStep("pos");
@@ -401,6 +413,8 @@ export default function App() {
             <StaffLogin 
               onLogin={handleStaffLogin} 
               onBack={() => setStep("store-login")}
+              shifts={shifts}
+              onUpdateShift={handleUpdateShift}
             />
           </motion.div>
         )}

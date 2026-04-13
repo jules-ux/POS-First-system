@@ -2,27 +2,31 @@ import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { Delete, UserCircle2, Users, Table, Clock, TrendingUp, ChevronLeft, Settings, X, Power } from "lucide-react";
-import { STAFF_MEMBERS, Staff } from "@/src/types";
+import { Delete, UserCircle2, Users, Table, Clock, TrendingUp, ChevronLeft, Settings, X, Power, Play, Coffee, LogOut, CheckCircle2 } from "lucide-react";
+import { STAFF_MEMBERS, Staff, Shift, ShiftStatus, StaffRole } from "@/src/types";
 
 interface StaffLoginProps {
   onLogin: (staff: Staff) => void;
   onBack: () => void;
+  shifts: Record<string, Shift>;
+  onUpdateShift: (staffId: string, shift: Shift | null) => void;
 }
 
-export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
+export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLoginProps) {
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isShiftManagerActive, setIsShiftManagerActive] = useState(false);
+  const [selectingRole, setSelectingRole] = useState(false);
 
-  // Calculate dynamic grid size (e.g., 4x4, 5x5, etc.)
+  // Calculate dynamic grid size
   const totalStaff = STAFF_MEMBERS.length;
   const gridSize = Math.max(4, Math.ceil(Math.sqrt(totalStaff)));
   const totalSlots = gridSize * gridSize;
 
   const handleNumberClick = (num: string) => {
-    if (code.length < 4) {
+    if (code.length < 6) {
       setCode(prev => prev + num);
       setError(false);
     }
@@ -34,15 +38,66 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
   };
 
   useEffect(() => {
-    if (code.length === 4 && selectedStaff) {
-      if (code === selectedStaff.pin) {
-        onLogin(selectedStaff);
-      } else {
+    if (selectedStaff && code === selectedStaff.pin) {
+      setIsShiftManagerActive(true);
+      setError(false);
+    } else {
+      setIsShiftManagerActive(false);
+      if (selectedStaff && code.length >= selectedStaff.pin.length && code !== selectedStaff.pin.slice(0, code.length)) {
         setError(true);
-        setCode("");
+        const timer = setTimeout(() => {
+          setCode("");
+          setError(false);
+        }, 1000);
+        return () => clearTimeout(timer);
       }
     }
-  }, [code, selectedStaff, onLogin]);
+  }, [code, selectedStaff]);
+
+  const handleOkClick = () => {
+    if (selectedStaff) {
+      onLogin(selectedStaff);
+    }
+  };
+
+  const currentShift = selectedStaff ? shifts[selectedStaff.id] : null;
+
+  const startShift = (role: StaffRole) => {
+    if (!selectedStaff) return;
+    onUpdateShift(selectedStaff.id, {
+      staffId: selectedStaff.id,
+      status: 'working',
+      role,
+      startTime: Date.now(),
+      totalBreakTime: 0
+    });
+    setSelectingRole(false);
+  };
+
+  const startBreak = () => {
+    if (!selectedStaff || !currentShift) return;
+    onUpdateShift(selectedStaff.id, {
+      ...currentShift,
+      status: 'on-break',
+      breakStartTime: Date.now()
+    });
+  };
+
+  const endBreak = () => {
+    if (!selectedStaff || !currentShift || !currentShift.breakStartTime) return;
+    const breakDuration = Date.now() - currentShift.breakStartTime;
+    onUpdateShift(selectedStaff.id, {
+      ...currentShift,
+      status: 'working',
+      breakStartTime: undefined,
+      totalBreakTime: currentShift.totalBreakTime + breakDuration
+    });
+  };
+
+  const endShift = () => {
+    if (!selectedStaff) return;
+    onUpdateShift(selectedStaff.id, null);
+  };
 
   return (
     <div className="h-screen w-full flex bg-zinc-50 overflow-hidden relative">
@@ -114,7 +169,6 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
               transition={{ duration: 0 }}
               className="flex-1 flex flex-col overflow-hidden h-full"
             >
-              {/* Dynamic Grid that fills the entire space */}
               <div className="flex-1 overflow-hidden">
                 <div 
                   className="grid w-full h-full"
@@ -141,7 +195,6 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
                       </span>
                     </button>
                   ))}
-                  {/* Fill empty cells to maintain grid borders */}
                   {totalStaff < totalSlots && 
                     Array.from({ length: totalSlots - totalStaff }).map((_, i) => (
                       <div key={`empty-${i}`} className="border-r border-b border-zinc-100 bg-zinc-50/30" />
@@ -160,18 +213,18 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
               className="flex-1 flex flex-col h-full bg-white"
             >
               {/* Top Section: Staff Info & PIN Status (1/3 height) */}
-              <div className="h-1/3 flex flex-col justify-center items-center px-8 border-b border-zinc-100">
+              <div className="h-1/3 flex flex-col justify-center items-center px-8 border-b border-zinc-100 relative">
                 <div className="text-center mb-6">
                   <div className="flex items-center justify-center gap-3 mb-1">
-                    <span className="text-3xl font-black text-zinc-950 tracking-tighter">{selectedStaff.number}</span>
-                    <div className="w-1 h-6 bg-orange-500/20 rounded-full" />
-                    <span className="text-xl font-bold text-zinc-400 uppercase tracking-widest">{selectedStaff.name}</span>
+                    <span className="text-4xl font-black text-zinc-950 tracking-tighter">{selectedStaff.number}</span>
+                    <div className="w-1.5 h-8 bg-orange-500 rounded-full" />
+                    <span className="text-2xl font-black text-zinc-400 uppercase tracking-widest">{selectedStaff.name}</span>
                   </div>
-                  <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em]">Security Verification Required</p>
+                  <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.3em]">Security Verification Required</p>
                 </div>
 
                 <div className="flex justify-center gap-6">
-                  {[0, 1, 2, 3].map((i) => (
+                  {Array.from({ length: selectedStaff.pin.length }).map((_, i) => (
                     <motion.div
                       key={i}
                       animate={error ? { x: [0, -10, 10, -10, 10, 0] } : {}}
@@ -210,17 +263,42 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
                 ))}
                 
                 {/* Bottom Row */}
-                <button
-                  onClick={() => {
-                    setSelectedStaff(null);
-                    setCode("");
-                    setError(false);
-                  }}
-                  className="flex flex-col items-center justify-center border-r border-zinc-100 bg-zinc-50 hover:bg-zinc-950 group"
-                >
-                  <ChevronLeft className="w-5 h-5 text-zinc-400 group-hover:text-orange-500 mb-1" />
-                  <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest group-hover:text-zinc-300">Change Staff</span>
-                </button>
+                <div className="relative border-r border-zinc-100">
+                  <AnimatePresence mode="wait">
+                    {code.length === 0 ? (
+                      <motion.button
+                        key="change-staff"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0 }}
+                        onClick={() => {
+                          setSelectedStaff(null);
+                          setIsShiftManagerActive(false);
+                          setSelectingRole(false);
+                        }}
+                        className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-50 hover:bg-zinc-950 group"
+                      >
+                        <ChevronLeft className="w-5 h-5 text-zinc-400 group-hover:text-orange-500 mb-1" />
+                        <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest group-hover:text-zinc-300">
+                          Change Staff
+                        </span>
+                      </motion.button>
+                    ) : (
+                      <motion.button
+                        key="backspace"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0 }}
+                        onClick={handleDelete}
+                        className="absolute inset-0 flex items-center justify-center bg-zinc-50 hover:bg-red-500 hover:text-white group"
+                      >
+                        <Delete className="w-8 h-8 text-zinc-400 group-hover:text-white" />
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </div>
                 
                 <button
                   onClick={() => handleNumberClick("0")}
@@ -230,10 +308,11 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
                 </button>
                 
                 <button
-                  onClick={handleDelete}
-                  className="flex items-center justify-center bg-zinc-50 hover:bg-red-500 hover:text-white group"
+                  onClick={handleOkClick}
+                  className="flex flex-col items-center justify-center bg-zinc-50 hover:bg-orange-500 group transition-all"
                 >
-                  <Delete className="w-8 h-8 text-zinc-400 group-hover:text-white" />
+                  <CheckCircle2 className="w-6 h-6 text-zinc-400 group-hover:text-white mb-1" />
+                  <span className="text-[10px] font-black text-zinc-400 group-hover:text-white uppercase tracking-widest">OK</span>
                 </button>
               </div>
             </motion.div>
@@ -241,7 +320,7 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
         </AnimatePresence>
       </div>
 
-      {/* Right Side: Live Stats */}
+      {/* Right Side: Live Stats or Shift Manager */}
       <div className="hidden lg:flex w-1/2 bg-zinc-950 flex-col p-12 justify-center overflow-y-auto relative">
         {/* Quick Access Circle Button */}
         <button 
@@ -251,41 +330,171 @@ export function StaffLogin({ onLogin, onBack }: StaffLoginProps) {
           <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
         </button>
 
-        <div className="max-w-md w-full mx-auto space-y-10">
-          <div>
-            <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-3">Live Terminal Status</h3>
-            <h2 className="text-3xl font-black text-white tracking-tight leading-tight">
-              Store is currently <span className="text-orange-500">Active</span>
-            </h2>
-          </div>
+        <AnimatePresence mode="wait">
+          {!isShiftManagerActive ? (
+            <motion.div 
+              key="stats"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="max-w-md w-full mx-auto space-y-10"
+            >
+              <div>
+                <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-3">Live Terminal Status</h3>
+                <h2 className="text-3xl font-black text-white tracking-tight leading-tight">
+                  Store is currently <span className="text-orange-500">Active</span>
+                </h2>
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <StatCard 
-              icon={Users} 
-              label="Active Servers" 
-              value="12" 
-              trend="+2 on floor"
-            />
-            <StatCard 
-              icon={Table} 
-              label="Tables Occupied" 
-              value="24/30" 
-              trend="80% Capacity"
-            />
-            <StatCard 
-              icon={Clock} 
-              label="Avg. Wait Time" 
-              value="14m" 
-              trend="Stable"
-            />
-            <StatCard 
-              icon={TrendingUp} 
-              label="Pending Orders" 
-              value="8" 
-              trend="4 Express"
-            />
-          </div>
-        </div>
+              <div className="grid grid-cols-2 gap-4">
+                <StatCard icon={Users} label="Active Servers" value="12" trend="+2 on floor" />
+                <StatCard icon={Table} label="Tables Occupied" value="24/30" trend="80% Capacity" />
+                <StatCard icon={Clock} label="Avg. Wait Time" value="14m" trend="Stable" />
+                <StatCard icon={TrendingUp} label="Pending Orders" value="8" trend="4 Express" />
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="shift-manager"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="max-w-md w-full mx-auto space-y-8"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                  <UserCircle2 className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Shift Manager</h3>
+                  <h2 className="text-2xl font-black text-white tracking-tight">{selectedStaff?.name}</h2>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
+                  <span className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em] block mb-2">Shift Duration</span>
+                  <span className="text-2xl font-black text-white tabular-nums">
+                    {currentShift?.startTime ? "02:14:05" : "--:--:--"}
+                  </span>
+                </div>
+                <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
+                  <span className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em] block mb-2">Previous Shift</span>
+                  <span className="text-2xl font-black text-zinc-400 tabular-nums">06:45:00</span>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-3 h-3 text-orange-500" />
+                    <span className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em]">Daily Sales Goal</span>
+                  </div>
+                  <span className="text-white text-[10px] font-black tabular-nums">$325 / $500</span>
+                </div>
+                <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: "65%" }}
+                    className="h-full bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.3)]"
+                  />
+                </div>
+                <div className="flex justify-between mt-2">
+                  <span className="text-zinc-600 text-[8px] font-bold uppercase tracking-widest">65% Achieved</span>
+                  <span className="text-zinc-600 text-[8px] font-bold uppercase tracking-widest">$175 Left</span>
+                </div>
+              </div>
+
+              <div className="bg-zinc-900 rounded-3xl p-8 border border-zinc-800 shadow-2xl">
+                <div className="mb-8">
+                  <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest block mb-2">Current Status</span>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${
+                      !currentShift ? "bg-zinc-700" : 
+                      currentShift.status === 'working' ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]" : 
+                      "bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.4)]"
+                    }`} />
+                    <span className="text-xl font-black text-white uppercase tracking-tight">
+                      {!currentShift ? "Not at work" : 
+                       currentShift.status === 'working' ? "At work" : "On Break"}
+                    </span>
+                  </div>
+                  {currentShift?.role && (
+                    <span className="text-zinc-500 text-xs font-bold mt-2 block">Role: {currentShift.role}</span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  {selectingRole ? (
+                    <div className="space-y-3">
+                      <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest block mb-2">Select Role</span>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(['Bediening', 'Keuken', 'Bar', 'Runner'] as StaffRole[]).map(role => (
+                          <Button 
+                            key={role}
+                            onClick={() => startShift(role)}
+                            className="h-12 bg-zinc-800 hover:bg-orange-500 text-white font-black text-xs rounded-xl transition-all"
+                          >
+                            {role.toUpperCase()}
+                          </Button>
+                        ))}
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => setSelectingRole(false)}
+                        className="w-full text-zinc-500 hover:text-white text-[10px] font-bold uppercase tracking-widest"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {!currentShift && (
+                        <Button 
+                          onClick={() => setSelectingRole(true)}
+                          className="h-16 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3"
+                        >
+                          <Play className="w-5 h-5 fill-current" />
+                          START SHIFT
+                        </Button>
+                      )}
+                      
+                      {currentShift?.status === 'working' && (
+                        <>
+                          <Button 
+                            onClick={startBreak}
+                            className="h-16 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-2xl shadow-xl shadow-orange-500/10 flex items-center justify-center gap-3"
+                          >
+                            <Coffee className="w-5 h-5" />
+                            START BREAK
+                          </Button>
+                          <Button 
+                            onClick={endShift}
+                            variant="outline"
+                            className="h-16 border-2 border-zinc-800 hover:bg-red-500 hover:border-red-500 text-zinc-400 hover:text-white font-black text-sm rounded-2xl flex items-center justify-center gap-3 transition-all"
+                          >
+                            <LogOut className="w-5 h-5" />
+                            END SHIFT
+                          </Button>
+                        </>
+                      )}
+
+                      {currentShift?.status === 'on-break' && (
+                        <Button 
+                          onClick={endBreak}
+                          className="h-16 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3"
+                        >
+                          <CheckCircle2 className="w-5 h-5" />
+                          END BREAK
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -304,18 +513,6 @@ function StatCard({ icon: Icon, label, value, trend }: { icon: any, label: strin
       <p className="text-2xl font-black text-white mb-0.5">{value}</p>
       <p className="text-zinc-600 text-[9px] font-bold uppercase tracking-widest">{trend}</p>
     </div>
-  );
-}
-
-function KeyButton({ children, onClick }: { children: ReactNode; onClick: () => void }) {
-  return (
-    <Button
-      variant="outline"
-      className="h-14 w-full text-lg font-bold border-zinc-100 bg-zinc-50 hover:bg-zinc-950 hover:text-white hover:border-zinc-950 transition-all active:scale-95 rounded-xl shadow-sm"
-      onClick={onClick}
-    >
-      {children}
-    </Button>
   );
 }
 
