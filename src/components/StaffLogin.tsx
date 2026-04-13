@@ -321,13 +321,13 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
       </div>
 
       {/* Right Side: Live Stats or Shift Manager */}
-      <div className="hidden lg:flex w-1/2 bg-zinc-950 flex-col p-12 justify-center overflow-y-auto relative">
+      <div className="hidden lg:flex w-1/2 bg-zinc-950 flex-col p-8 justify-center overflow-y-auto relative">
         {/* Quick Access Circle Button */}
         <button 
           onClick={() => setIsMenuOpen(true)}
-          className="absolute top-8 right-8 w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 hover:border-white/20 active:scale-95 group z-50"
+          className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 hover:border-white/20 active:scale-95 group z-50"
         >
-          <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+          <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" />
         </button>
 
         <AnimatePresence mode="wait">
@@ -337,10 +337,10 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="max-w-md w-full mx-auto space-y-10"
+              className="max-w-md w-full mx-auto space-y-8"
             >
               <div>
-                <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-3">Live Terminal Status</h3>
+                <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Live Terminal Status</h3>
                 <h2 className="text-3xl font-black text-white tracking-tight leading-tight">
                   Store is currently <span className="text-orange-500">Active</span>
                 </h2>
@@ -359,81 +359,81 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="max-w-md w-full mx-auto space-y-8"
+              className="max-w-md w-full mx-auto space-y-5"
             >
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-16 h-16 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                  <UserCircle2 className="w-8 h-8 text-white" />
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                  <UserCircle2 className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Shift Manager</h3>
-                  <h2 className="text-2xl font-black text-white tracking-tight">{selectedStaff?.name}</h2>
+                  <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5">Shift Manager</h3>
+                  <h2 className="text-xl font-black text-white tracking-tight">{selectedStaff?.name}</h2>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
-                  <span className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em] block mb-2">Shift Duration</span>
-                  <span className="text-2xl font-black text-white tabular-nums">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-5 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
+                  <span className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em] block mb-1.5">Shift Duration</span>
+                  <span className="text-xl font-black text-white tabular-nums">
                     {currentShift?.startTime ? "02:14:05" : "--:--:--"}
                   </span>
                 </div>
-                <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
-                  <span className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em] block mb-2">Previous Shift</span>
-                  <span className="text-2xl font-black text-zinc-400 tabular-nums">06:45:00</span>
+                <div className="p-5 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
+                  <span className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em] block mb-1.5">Previous Shift</span>
+                  <span className="text-xl font-black text-zinc-400 tabular-nums">06:45:00</span>
                 </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
-                <div className="flex justify-between items-center mb-3">
+              <div className="p-5 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-xl">
+                <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-3 h-3 text-orange-500" />
                     <span className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.2em]">Daily Sales Goal</span>
                   </div>
                   <span className="text-white text-[10px] font-black tabular-nums">$325 / $500</span>
                 </div>
-                <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: "65%" }}
                     className="h-full bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.3)]"
                   />
                 </div>
-                <div className="flex justify-between mt-2">
+                <div className="flex justify-between mt-1.5">
                   <span className="text-zinc-600 text-[8px] font-bold uppercase tracking-widest">65% Achieved</span>
                   <span className="text-zinc-600 text-[8px] font-bold uppercase tracking-widest">$175 Left</span>
                 </div>
               </div>
 
-              <div className="bg-zinc-900 rounded-3xl p-8 border border-zinc-800 shadow-2xl">
-                <div className="mb-8">
-                  <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest block mb-2">Current Status</span>
+              <div className="bg-zinc-900 rounded-3xl p-6 border border-zinc-800 shadow-2xl">
+                <div className="mb-4">
+                  <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest block mb-1.5">Current Status</span>
                   <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${
+                    <div className={`w-2.5 h-2.5 rounded-full ${
                       !currentShift ? "bg-zinc-700" : 
                       currentShift.status === 'working' ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]" : 
                       "bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.4)]"
                     }`} />
-                    <span className="text-xl font-black text-white uppercase tracking-tight">
+                    <span className="text-lg font-black text-white uppercase tracking-tight">
                       {!currentShift ? "Not at work" : 
                        currentShift.status === 'working' ? "At work" : "On Break"}
                     </span>
                   </div>
                   {currentShift?.role && (
-                    <span className="text-zinc-500 text-xs font-bold mt-2 block">Role: {currentShift.role}</span>
+                    <span className="text-zinc-500 text-[10px] font-bold mt-1 block">Role: {currentShift.role}</span>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-2.5">
                   {selectingRole ? (
-                    <div className="space-y-3">
-                      <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest block mb-2">Select Role</span>
+                    <div className="space-y-2.5">
+                      <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest block mb-1">Select Role</span>
                       <div className="grid grid-cols-2 gap-2">
                         {(['Bediening', 'Keuken', 'Bar', 'Runner'] as StaffRole[]).map(role => (
                           <Button 
                             key={role}
                             onClick={() => startShift(role)}
-                            className="h-12 bg-zinc-800 hover:bg-orange-500 text-white font-black text-xs rounded-xl transition-all"
+                            className="h-11 bg-zinc-800 hover:bg-orange-500 text-white font-black text-[10px] rounded-xl transition-all"
                           >
                             {role.toUpperCase()}
                           </Button>
@@ -442,7 +442,7 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
                       <Button 
                         variant="ghost" 
                         onClick={() => setSelectingRole(false)}
-                        className="w-full text-zinc-500 hover:text-white text-[10px] font-bold uppercase tracking-widest"
+                        className="w-full text-zinc-500 hover:text-white text-[9px] font-bold uppercase tracking-widest h-8"
                       >
                         Cancel
                       </Button>
@@ -452,9 +452,9 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
                       {!currentShift && (
                         <Button 
                           onClick={() => setSelectingRole(true)}
-                          className="h-16 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3"
+                          className="h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs rounded-2xl shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3"
                         >
-                          <Play className="w-5 h-5 fill-current" />
+                          <Play className="w-4 h-4 fill-current" />
                           START SHIFT
                         </Button>
                       )}
@@ -463,17 +463,17 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
                         <>
                           <Button 
                             onClick={startBreak}
-                            className="h-16 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-2xl shadow-xl shadow-orange-500/10 flex items-center justify-center gap-3"
+                            className="h-14 bg-orange-500 hover:bg-orange-600 text-white font-black text-xs rounded-2xl shadow-xl shadow-orange-500/10 flex items-center justify-center gap-3"
                           >
-                            <Coffee className="w-5 h-5" />
+                            <Coffee className="w-4 h-4" />
                             START BREAK
                           </Button>
                           <Button 
                             onClick={endShift}
                             variant="outline"
-                            className="h-16 border-2 border-zinc-800 hover:bg-red-500 hover:border-red-500 text-zinc-400 hover:text-white font-black text-sm rounded-2xl flex items-center justify-center gap-3 transition-all"
+                            className="h-14 border-2 border-zinc-800 hover:bg-red-500 hover:border-red-500 text-zinc-400 hover:text-white font-black text-xs rounded-2xl flex items-center justify-center gap-3 transition-all"
                           >
-                            <LogOut className="w-5 h-5" />
+                            <LogOut className="w-4 h-4" />
                             END SHIFT
                           </Button>
                         </>
@@ -482,9 +482,9 @@ export function StaffLogin({ onLogin, onBack, shifts, onUpdateShift }: StaffLogi
                       {currentShift?.status === 'on-break' && (
                         <Button 
                           onClick={endBreak}
-                          className="h-16 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3"
+                          className="h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs rounded-2xl shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3"
                         >
-                          <CheckCircle2 className="w-5 h-5" />
+                          <CheckCircle2 className="w-4 h-4" />
                           END BREAK
                         </Button>
                       )}
