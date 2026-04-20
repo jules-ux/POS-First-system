@@ -274,7 +274,7 @@ export default function App() {
   const [step, setStep] = useState<AppStep>("store-login");
   const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("FOOD");
+  const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
   
   const [activeMode, setActiveMode] = useState<POSMode>("NONE");
   const [pendingMode, setPendingMode] = useState<POSMode>("NONE");
@@ -284,6 +284,7 @@ export default function App() {
   const [couponCode, setCouponCode] = useState("");
   const [discounts, setDiscounts] = useState<{ type: 'percentage' | 'fixed', value: number, label: string }[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [pendingCategory, setPendingCategory] = useState<string | null>(null);
 
   const [pendingQty, setPendingQty] = useState("");
   const [isNegative, setIsNegative] = useState(false);
@@ -365,6 +366,16 @@ export default function App() {
 
   const handleAddDiscount = (type: 'percentage' | 'fixed', value: number, label: string) => {
     setDiscounts(prev => [...prev, { type, value, label }]);
+  };
+
+  const handleCategoryClick = (category: string) => {
+    if (activeMode !== "NONE") {
+      setPendingCategory(category);
+      setPendingMode("NONE");
+      setExitWarningMode(activeMode);
+    } else {
+      setSelectedCategory(category);
+    }
   };
 
   const hasChanges = (mode: POSMode) => {
@@ -491,7 +502,7 @@ export default function App() {
                         {CATEGORIES.map(cat => (
                           <button
                             key={cat}
-                            onClick={() => setSelectedCategory(cat)}
+                            onClick={() => handleCategoryClick(cat)}
                             className={`px-5 py-2.5 rounded-xl text-sm font-black whitespace-nowrap transition-all ${
                               selectedCategory === cat 
                                 ? 'bg-zinc-900 text-white shadow-md' 
@@ -741,7 +752,7 @@ export default function App() {
                           <NavBlock 
                             label={cat} 
                             active={selectedCategory === cat} 
-                            onClick={() => setSelectedCategory(cat)}
+                            onClick={() => handleCategoryClick(cat)}
                           />
                         </div>
                       ))}
@@ -773,7 +784,7 @@ export default function App() {
                                 <NavBlock 
                                   label={cat} 
                                   active={selectedCategory === cat} 
-                                  onClick={() => setSelectedCategory(cat)}
+                                  onClick={() => handleCategoryClick(cat)}
                                 />
                               </div>
                             ))}
@@ -834,7 +845,13 @@ export default function App() {
                                 return newCart;
                               });
                               setSplitCart([]);
-                              setActiveMode(pendingMode);
+                              if (pendingCategory) {
+                                setSelectedCategory(pendingCategory);
+                                setPendingCategory(null);
+                                setActiveMode("NONE");
+                              } else {
+                                setActiveMode(pendingMode);
+                              }
                               setExitWarningMode("NONE");
                               setPendingMode("NONE");
                             }}
@@ -858,13 +875,20 @@ export default function App() {
                             onConfirmExit={() => {
                               setPendingQty("");
                               setCouponCode("");
-                              setActiveMode(pendingMode);
+                              if (pendingCategory) {
+                                setSelectedCategory(pendingCategory);
+                                setPendingCategory(null);
+                                setActiveMode("NONE");
+                              } else {
+                                setActiveMode(pendingMode);
+                              }
                               setExitWarningMode("NONE");
                               setPendingMode("NONE");
                             }}
                             onCancelExit={() => {
                               setExitWarningMode("NONE");
                               setPendingMode("NONE");
+                              setPendingCategory(null);
                             }}
                           />
                         ) : activeMode === "EDIT" && editingItem ? (
@@ -872,6 +896,23 @@ export default function App() {
                             item={editingItem}
                             onSave={handleSaveModifications}
                             onClose={() => setActiveMode("NONE")}
+                            exitRequested={exitWarningMode === "EDIT"}
+                            onConfirmExit={() => {
+                              if (pendingCategory) {
+                                setSelectedCategory(pendingCategory);
+                                setPendingCategory(null);
+                                setActiveMode("NONE");
+                              } else {
+                                setActiveMode(pendingMode);
+                              }
+                              setExitWarningMode("NONE");
+                              setPendingMode("NONE");
+                            }}
+                            onCancelExit={() => {
+                              setExitWarningMode("NONE");
+                              setPendingMode("NONE");
+                              setPendingCategory(null);
+                            }}
                           />
                         ) : activeMode === "TABLES" ? (
                           <div className="flex-1 flex items-center justify-center bg-zinc-50">
@@ -991,7 +1032,7 @@ export default function App() {
                           key={cat}
                           label={cat} 
                           active={selectedCategory === cat} 
-                          onClick={() => setSelectedCategory(cat)}
+                          onClick={() => handleCategoryClick(cat)}
                         />
                       ))}
                     </div>
@@ -1022,7 +1063,7 @@ export default function App() {
                                 key={cat}
                                 label={cat} 
                                 active={selectedCategory === cat} 
-                                onClick={() => setSelectedCategory(cat)}
+                                onClick={() => handleCategoryClick(cat)}
                               />
                             ))}
                           </div>
@@ -1081,13 +1122,20 @@ export default function App() {
                                 return newCart;
                               });
                               setSplitCart([]);
-                              setActiveMode(pendingMode);
+                              if (pendingCategory) {
+                                setSelectedCategory(pendingCategory);
+                                setPendingCategory(null);
+                                setActiveMode("NONE");
+                              } else {
+                                setActiveMode(pendingMode);
+                              }
                               setExitWarningMode("NONE");
                               setPendingMode("NONE");
                             }}
                             onCancelExit={() => {
                               setExitWarningMode("NONE");
                               setPendingMode("NONE");
+                              setPendingCategory(null);
                             }}
                           />
                         ) : activeMode === "COUPON" ? (
@@ -1105,13 +1153,20 @@ export default function App() {
                             onConfirmExit={() => {
                               setPendingQty("");
                               setCouponCode("");
-                              setActiveMode(pendingMode);
+                              if (pendingCategory) {
+                                setSelectedCategory(pendingCategory);
+                                setPendingCategory(null);
+                                setActiveMode("NONE");
+                              } else {
+                                setActiveMode(pendingMode);
+                              }
                               setExitWarningMode("NONE");
                               setPendingMode("NONE");
                             }}
                             onCancelExit={() => {
                               setExitWarningMode("NONE");
                               setPendingMode("NONE");
+                              setPendingCategory(null);
                             }}
                           />
                         ) : activeMode === "EDIT" && editingItem ? (
@@ -1119,6 +1174,23 @@ export default function App() {
                             item={editingItem}
                             onSave={handleSaveModifications}
                             onClose={() => setActiveMode("NONE")}
+                            exitRequested={exitWarningMode === "EDIT"}
+                            onConfirmExit={() => {
+                              if (pendingCategory) {
+                                setSelectedCategory(pendingCategory);
+                                setPendingCategory(null);
+                                setActiveMode("NONE");
+                              } else {
+                                setActiveMode(pendingMode);
+                              }
+                              setExitWarningMode("NONE");
+                              setPendingMode("NONE");
+                            }}
+                            onCancelExit={() => {
+                              setExitWarningMode("NONE");
+                              setPendingMode("NONE");
+                              setPendingCategory(null);
+                            }}
                           />
                         ) : activeMode === "TABLES" ? (
                           <div className="flex-1 flex items-center justify-center bg-zinc-50">

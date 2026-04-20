@@ -8,9 +8,19 @@ interface EditItemViewProps {
   item: CartItem;
   onSave: (cartItemId: string, modifications: string[]) => void;
   onClose: () => void;
+  exitRequested?: boolean;
+  onConfirmExit?: () => void;
+  onCancelExit?: () => void;
 }
 
-export function EditItemView({ item, onSave, onClose }: EditItemViewProps) {
+export function EditItemView({ 
+  item, 
+  onSave, 
+  onClose,
+  exitRequested,
+  onConfirmExit,
+  onCancelExit
+}: EditItemViewProps) {
   const mods = item.modifications || [];
 
   const updateMods = (newMods: string[]) => {
@@ -121,6 +131,34 @@ export function EditItemView({ item, onSave, onClose }: EditItemViewProps) {
           </div>
         </div>
       </div>
+
+      {exitRequested && (
+        <div className="absolute inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-[4vh]">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white p-[4vh] rounded-none border-4 border-zinc-900 max-w-[50vh] w-full shadow-[1vh_1vh_0px_0px_rgba(0,0,0,1)]"
+          >
+            <h3 className="text-[2vh] font-black text-zinc-900 uppercase tracking-tight mb-[1vh]">Close Edit View?</h3>
+            <p className="text-[1.2vh] font-bold text-zinc-500 uppercase tracking-widest mb-[4vh]">Do you want to close this?</p>
+            <div className="grid grid-cols-2 gap-[2vh]">
+              <Button 
+                variant="outline" 
+                onClick={onCancelExit}
+                className="h-[6vh] rounded-none border-2 border-zinc-200 font-black uppercase tracking-widest text-[1.1vh]"
+              >
+                No, Stay
+              </Button>
+              <Button 
+                onClick={onConfirmExit}
+                className="h-[6vh] rounded-none bg-zinc-900 hover:bg-zinc-800 text-white font-black uppercase tracking-widest text-[1.1vh]"
+              >
+                Yes, Close
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </motion.div>
 );
 }
